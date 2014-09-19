@@ -1,5 +1,5 @@
 begin
-  @version = 1.0
+  VERSION = 1.0
   @method = 'objectWalker'
   @recursion_level = 0
   MAX_RECURSION_LEVEL = 6
@@ -13,11 +13,11 @@ begin
                           "MiqAeServiceMiqProvisionRequestTemplate" => ["miq_request", "miq_request_tasks"],
                           "MiqAeServiceMiqProvisionVmware" => ["source", "destination", "miq_provision_request", "miq_request", "miq_request_task", "vm"],
                           "MiqAeServiceMiqProvisionRedhatViaPxe" => [:ALL],
-                          "MiqAeServiceVmVmware" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service"],
+                          "MiqAeServiceVmVmware" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware"],
                           "MiqAeServiceVmRedhat" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware"],
                           "MiqAeServiceHardware" => ["nics"]}
   
-  $evm.log("info", "#{@method} #{@version} - EVM Automate Method Started")
+  $evm.log("info", "#{@method} #{VERSION} - EVM Automate Method Started")
   
   def dump_attributes(object_string, this_object, spaces)
     #
@@ -158,10 +158,8 @@ begin
       @object_recorder[this_object_class] = []
       @object_recorder[this_object_class] << this_object_id
     end
-  
-    if @recursion_level == 1
-      $evm.log("info", "#{spaces}#{@method}:   Dumping $evm.root")
-    end
+    
+    $evm.log("info", "#{spaces}#{@method}:   Dumping $evm.root") if @recursion_level == 1
     #
     # Write out the things of interest
     #
