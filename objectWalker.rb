@@ -1,21 +1,32 @@
 begin
-  VERSION = 1.0
+  VERSION = 1.1
+  MAX_RECURSION_LEVEL = 7
   @method = 'objectWalker'
   @recursion_level = 0
-  MAX_RECURSION_LEVEL = 6
   @object_recorder = {}
   @print_nil_values = false
   @debug = false
-  @walk_associations = { "MiqAeServiceServiceTemplateProvisionTask" => ["source", "destination", "miq_request", "miq_request_tasks", "service_resource"],
-                          "MiqAeServiceServiceTemplate" => ["service_resources"],
-                          "MiqAeServiceServiceResource" => ["resource", "service_template"],
-                          "MiqAeServiceMiqProvisionRequest" => ["miq_request", "miq_request_tasks"],
-                          "MiqAeServiceMiqProvisionRequestTemplate" => ["miq_request", "miq_request_tasks"],
-                          "MiqAeServiceMiqProvisionVmware" => ["source", "destination", "miq_provision_request", "miq_request", "miq_request_task", "vm"],
-                          "MiqAeServiceMiqProvisionRedhatViaPxe" => [:ALL],
-                          "MiqAeServiceVmVmware" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware"],
-                          "MiqAeServiceVmRedhat" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware"],
-                          "MiqAeServiceHardware" => ["nics"]}
+  #
+  # The following symbol should have the value of either :whitelist or :blacklist. This will determine whether we either 
+  # walk all associations _except_ those in the @walk_association_blacklist hash, or _only_ the associations in the
+  # @walk_association_whitelist hash
+  #
+  @walk_association_policy = :blacklist
+  @walk_association_whitelist = { "MiqAeServiceServiceTemplateProvisionTask" => ["source", "destination", "miq_request", "miq_request_tasks", "service_resource"],
+                                  "MiqAeServiceServiceTemplate" => ["service_resources"],
+                                  "MiqAeServiceServiceResource" => ["resource", "service_template"],
+                                  "MiqAeServiceMiqProvisionRequest" => ["miq_request", "miq_request_tasks"],
+                                  "MiqAeServiceMiqProvisionRequestTemplate" => ["miq_request", "miq_request_tasks"],
+                                  "MiqAeServiceMiqProvisionVmware" => ["source", "destination", "miq_provision_request", "miq_request", "miq_request_task", "vm"],
+                                  "MiqAeServiceMiqProvisionRedhatViaPxe" => [:ALL],
+                                  "MiqAeServiceVmVmware" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware"],
+                                  "MiqAeServiceVmRedhat" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware"],
+                                  "MiqAeServiceHardware" => ["nics"]}
+  
+  @walk_association_blacklist = { "MiqAeServiceEmsCluster" => ["all_vms", "vms", "ems_events"],
+                                  "MiqAeServiceEmsRedhat" => ["ems_events"],
+                                  "MiqAeServiceHostRedhat" => ["guest_applications", "ems_events"]}
+
   
   $evm.log("info", "#{@method} #{VERSION} - EVM Automate Method Started")
   
@@ -70,9 +81,38 @@ begin
     end
   end
   
+  def dump_association(object_string, association, associated_objects, spaces)
+    #
+    # Make it look like we're iterating though plural associations
+    #
+    number_of_associated_objects = associated_objects.length
+    if (association =~ /.*s$/)
+      assignment_string = "#{object_string}.#{association}.each do |#{association.chop}|"
+    else
+      assignment_string = "#{association} = #{object_string}.#{association}"
+    end
+    $evm.log("info", "#{spaces}#{@method}:   #{assignment_string}")
+    associated_objects.each do |associated_object|
+      associated_object_class = "#{associated_object.method_missing(:class)}".demodulize
+      associated_object_id = associated_object.id rescue associated_object.object_id
+      $evm.log("info", "#{spaces}|    #{@method}:   (object type: #{associated_object_class}, object ID: #{associated_object_id})")
+      if (association =~ /.*s$/)
+        dump_object("#{association.chop}", associated_object, spaces)
+        if number_of_associated_objects > 1
+          $evm.log("info", "#{spaces}#{@method}:  --- next #{association.chop} ---")
+          number_of_associated_objects -= 1
+        else
+          $evm.log("info", "#{spaces}#{@method}:  --- end of #{object_string}.#{association}.each do |#{association.chop}| ---")
+        end
+      else
+        dump_object("#{association}", associated_object, spaces)
+      end
+    end
+  end
+  
   def dump_associations(object_string, this_object, this_object_class, spaces)
     #
-    # Print the associations of this object if defined in the @walk_associations hash
+    # Print the associations of this object according to the @walk_associations_whitelist & @walk_associations_blacklist hashes
     #
     object_associations = []
     associated_objects = []
@@ -88,31 +128,21 @@ begin
             #
             # See if we need to walk this association 
             #
-            walk_this = false
-            if @walk_associations.has_key?(this_object_class)
-              if @walk_associations[this_object_class].include?(:ALL) || @walk_associations[this_object_class].include?(association.to_s)
-                walk_this = true
-                if (association =~ /.*s$/)
-                  assignment_string = "#{object_string}.#{association}.each do |#{association.chop}|"
-                else
-                  assignment_string = "#{association} = #{object_string}.#{association}"
-                end
-                $evm.log("info", "#{spaces}#{@method}:   #{assignment_string}")
-                associated_objects.each do |associated_object|
-                  associated_object_class = "#{associated_object.method_missing(:class)}".demodulize
-                  associated_object_id = associated_object.id rescue associated_object.object_id
-                  $evm.log("info", "#{spaces}|    #{@method}:   (object type: #{associated_object_class}, object ID: #{associated_object_id})")
-                  if (association =~ /.*s$/)
-                    dump_object("#{association.chop}", associated_object, spaces)
-                    $evm.log("info", "#{spaces}#{@method}:  ---")
-                  else
-                    dump_object("#{association}", associated_object, spaces)
-                  end
-                end
+            if @walk_association_policy == :whitelist
+              if @walk_association_whitelist.has_key?(this_object_class) && (@walk_association_whitelist[this_object_class].include?(:ALL) || @walk_association_whitelist[this_object_class].include?(association.to_s))
+                dump_association(object_string, association, associated_objects, spaces)
+              else
+                $evm.log("info", "#{spaces}#{@method}:     (#{association} isn't in the @walk_association_whitelist hash for #{this_object_class} and so has not been walked...)")
               end
-            end
-            unless walk_this
-              $evm.log("info", "#{spaces}#{@method}:     (#{association} isn't in the @walk_associations hash for #{this_object_class}...)")
+            elsif @walk_association_policy == :blacklist
+              if @walk_association_blacklist.has_key?(this_object_class) && (@walk_association_blacklist[this_object_class].include?(:ALL) || @walk_association_blacklist[this_object_class].include?(association.to_s))
+                $evm.log("info", "#{spaces}#{@method}:     (#{association} is in the @walk_association_blacklist hash for #{this_object_class} and so has not been walked...)")
+              else
+                dump_association(object_string, association, associated_objects, spaces)
+              end
+            else
+              $evm.log("info", "#{spaces}#{@method}:     Invalid @walk_association_policy: #{@walk_association_policy}")
+              exit MIQ_ABORT
             end
           end
         rescue NoMethodError
