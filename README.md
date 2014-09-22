@@ -10,7 +10,7 @@ This script is an attempt to demystify the object structure that is available at
 Calling the script from any point will walk the object hierarchy from $evm.root downwards, printing objects and attributes 
 as it goes, i.e.
 
-objectWalker 1.0 - EVM Automate Method Started  
+```objectWalker 1.0 - EVM Automate Method Started  
       objectWalker:   Dumping $evm.root  
       objectWalker:   $evm.root.ae_result = ok   (type: String)  
       objectWalker:   $evm.root.ae_state = RegisterDHCP   (type: String)  
@@ -33,7 +33,7 @@ objectWalker 1.0 - EVM Automate Method Started
       |    objectWalker:   destination = $evm.root['miq_provision'].destination  
       |    |    objectWalker:   (object type: MiqAeServiceVmRedhat, object ID: 1000000000058)  
       |    |    objectWalker:   destination.connection_state = connected   (type: String)  
-      |    |    objectWalker:   destination.created_on = 2014-09-18 11:35:17 UTC   (type: ActiveSupport::TimeWithZone)  
+      |    |    objectWalker:   destination.created_on = 2014-09-18 11:35:17 UTC   (type: ActiveSupport::TimeWithZone)  ```
   etc
       
 Many of the objects that we can walk through are in fact Rails Active Record Associations (object representations of database 
@@ -50,7 +50,7 @@ $evm.root['vm'].datacenter (type: Association, objects found)
 If you wish to explore and dump this associaiton, edit the hash to add the association name to the list associated with the 
 object type. The symbol :ALL can be used to walk all associations of an object type
 
-@walk_association_whitelist = { "MiqAeServiceServiceTemplateProvisionTask" => ["source", "destination", "miq_request", "miq_request_tasks", "service_resource"],
+```@walk_association_whitelist = { "MiqAeServiceServiceTemplateProvisionTask" => ["source", "destination", "miq_request", "miq_request_tasks", "service_resource"],
                                 "MiqAeServiceServiceTemplate" => ["service_resources"],
                                 "MiqAeServiceServiceResource" => ["resource", "service_template"],
                                 "MiqAeServiceMiqProvisionRequest" => ["miq_request", "miq_request_tasks"],
@@ -59,15 +59,15 @@ object type. The symbol :ALL can be used to walk all associations of an object t
                                 "MiqAeServiceMiqProvisionRedhatViaPxe" => [:ALL],
                                 "MiqAeServiceVmVmware" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware"],
                                 "MiqAeServiceVmRedhat" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware"],
-                                "MiqAeServiceHardware" => ["nics"]}
+                                "MiqAeServiceHardware" => ["nics"]}```
 
 if @walk_association_policy = :blacklist, then objectWalker will traverse all associations of all objects, except those that 
 are explicitly mentioned in the @walk_association_blacklist hash. This enables us to run a more exploratory dump, at the 
 cost of a much more verbose output. The symbol:ALL can be used to prevent the walking any associations of an object type
 
-@walk_association_blacklist = { "MiqAeServiceEmsCluster" => ["all_vms", "vms", "ems_events"],
+```@walk_association_blacklist = { "MiqAeServiceEmsCluster" => ["all_vms", "vms", "ems_events"],
                                 "MiqAeServiceEmsRedhat" => ["ems_events"],
-                                "MiqAeServiceHostRedhat" => ["guest_applications", "ems_events"]}
+                                "MiqAeServiceHostRedhat" => ["guest_applications", "ems_events"]}```
 
 
 Several of the objects in the Automate model have circular references to themselves either directly or indirectly through 
@@ -77,7 +77,7 @@ objectWalker:   Object MiqAeServiceServiceTemplate with ID 1000000000003 has alr
 
 Many attributes that get dumped have a value of 'nil', i.e.
  
-      objectWalker:   $evm.root['user'] => #<MiqAeMethodService::MiqAeServiceUser:0x000000056e9bf0>   (type: DRb::DRbObject)  
+```      objectWalker:   $evm.root['user'] => #<MiqAeMethodService::MiqAeServiceUser:0x000000056e9bf0>   (type: DRb::DRbObject)  
       |    objectWalker:   $evm.root['user'].created_on = 2014-09-16 07:52:05 UTC   (type: ActiveSupport::TimeWithZone)  
       |    objectWalker:   $evm.root['user'].current_group_id = 1000000000001   (type: Fixnum)  
       |    objectWalker:   $evm.root['user'].email = nil  
@@ -90,7 +90,7 @@ Many attributes that get dumped have a value of 'nil', i.e.
       |    objectWalker:   $evm.root['user'].custom_2 = nil  
       |    objectWalker:   $evm.root['user'].custom_3 = nil  
       |    objectWalker:   $evm.root['user'].custom_4 = nil  
-      |    objectWalker:   $evm.root['user'].custom_5 = nil  
+      |    objectWalker:   $evm.root['user'].custom_5 = nil  ```
       
 Sometimes we want to know that the attribute is present, even if its value is nil, but at other times we only wish to know
 about attributes with valid values (this also gives us a more concise dump output). In this case we can define the script 
