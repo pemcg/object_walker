@@ -1,9 +1,7 @@
 objectWalker
 ============
 
-One of the challenges when starting out writing automation scripts, is knowing where the objects and attributes are 
-under $evm.root that we may need to access. For example, depending on the automation action, we may have an $evm.root['vm'] 
-object, or we may not.
+One of the challenges when starting out writing CloudForms or ManageIQ automation scripts, is knowing where the objects and attributes are under $evm.root that we may need to access. For example, depending on the automation action, we may have an $evm.root['vm'] object, or we may not.
  
 This script is an attempt to demystify the object structure that is available at any point in the Automation engine. 
 
@@ -18,9 +16,9 @@ objectWalker 1.0 - EVM Automate Method Started
       objectWalker:   $evm.root.ae_state = RegisterDHCP   (type: String)  
       objectWalker:   $evm.root.ae_state_retries = 0   (type: Fixnum)  
       objectWalker:   $evm.root.ae_state_started = 2014-09-18 12:00:57 UTC   (type: String)  
-      objectWalker:   $evm.root['miq_provision'] => #<MiqAeMethodService::MiqAeServiceMiqProvisionRedhatViaPxe:0x0000000f6b5d78>   (type: DRb::DRbObject)  
-      |    objectWalker:   $evm.root['miq_provision'].created_on = 2014-09-18 11:33:22 UTC   (type: ActiveSupport::TimeWithZone)  
-      |    objectWalker:   $evm.root['miq_provision'].description = Provision from [Generic-1CPU-2GB-20GB-RHEL-6.4] to [cfme027]   (type: String)  
+      objectWalker:   $evm.root['miq_provision'] => #<MiqAeMethodService::MiqAeServiceMiqProvisionRedhatViaPxe:0x0000000f6b5d78>
+      |    objectWalker:   $evm.root['miq_provision'].created_on = 2014-09-18 11:33:22 UTC   (type: ActiveSupport::TimeWithZone) 
+      |    objectWalker:   $evm.root['miq_provision'].description = Provision from [Generic] to [cfme027]   (type: String)  
       |    objectWalker:   $evm.root['miq_provision'].destination_id = 1000000000058   (type: Fixnum)  
       |    objectWalker:   $evm.root['miq_provision'].destination_type = VmOrTemplate   (type: String)  
       |    objectWalker:   $evm.root['miq_provision'].id = 1000000000102   (type: Fixnum)  
@@ -54,15 +52,15 @@ If you wish to explore and dump this associaiton, edit the hash to add the assoc
 object type. The symbol :ALL can be used to walk all associations of an object type
 
 ```ruby
-@walk_association_whitelist = { "MiqAeServiceServiceTemplateProvisionTask" => ["source", "destination", "miq_request", "miq_request_tasks", "service_resource"],
+@walk_association_whitelist = { "MiqAeServiceServiceTemplateProvisionTask" => ["source", "destination", "miq_request"],
                                 "MiqAeServiceServiceTemplate" => ["service_resources"],
                                 "MiqAeServiceServiceResource" => ["resource", "service_template"],
                                 "MiqAeServiceMiqProvisionRequest" => ["miq_request", "miq_request_tasks"],
                                 "MiqAeServiceMiqProvisionRequestTemplate" => ["miq_request", "miq_request_tasks"],
-                                "MiqAeServiceMiqProvisionVmware" => ["source", "destination", "miq_provision_request", "miq_request", "miq_request_task", "vm"],
+                                "MiqAeServiceMiqProvisionVmware" => ["source", "destination", "miq_provision_request"],
                                 "MiqAeServiceMiqProvisionRedhatViaPxe" => [:ALL],
-                                "MiqAeServiceVmVmware" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware"],
-                                "MiqAeServiceVmRedhat" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware"],
+                                "MiqAeServiceVmVmware" => ["ems_cluster", "storage", "service", "hardware"],
+                                "MiqAeServiceVmRedhat" => ["ems_cluster", "storage", "service", "hardware"],
                                 "MiqAeServiceHardware" => ["nics"]}
 ```
 
