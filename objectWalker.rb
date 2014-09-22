@@ -4,7 +4,7 @@
 # Can be called from anywhere in the CloudForms / ManageIQ automation namespace, and will walk the automation object structure starting from $evm.root
 # and dump (to automation.log) its attributes, any objects found, their attributes, virtual columns, and associations, and so on.
 #
-# Author:	Peter McGowan (pemcg@redhat.com)
+# Author:   Peter McGowan (pemcg@redhat.com)
 #           Copyright 2014 Peter McGowan, Red Hat
 #
 # Revision History
