@@ -80,7 +80,9 @@ cost of a much more verbose output. The symbol:ALL can be used to prevent the wa
 Several of the objects in the Automate model have circular references to themselves either directly or indirectly through 
 other associations. To prevent the same object being dumped multiple times the script records where it's been, and prints:
  
+```
 objectWalker:   Object MiqAeServiceServiceTemplate with ID 1000000000003 has already been dumped...
+```
 
 Many attributes that get dumped have a value of 'nil', i.e.
  
