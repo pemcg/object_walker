@@ -27,7 +27,7 @@ if options[:timestamp] && options[:list]
   exit!
 end
 
-objectwalkerstart_re = /----\] I, \[(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}) .*objectWalker 1.0 - EVM Automate Method Started/
+objectwalkerstart_re = /----\] I, \[(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}) .*objectWalker \d{1,}\.\d{1,} - EVM Automate Method Started/
 objectwalker_re = /.*(AEMethod objectwalker|Defined Method)\> (.*)/
 
 dump_start = 0
