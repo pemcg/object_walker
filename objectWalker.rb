@@ -17,18 +17,19 @@
 @method = 'objectWalker'
 VERSION = 1.3
 #
+@recursion_level = 0
+@object_recorder = {}
+@debug = false
+#
 # Change MAX_RECURSION_LEVEL to adjust the depth of recursion that objectWalker traverses through the objects
 #
 MAX_RECURSION_LEVEL = 7
-@recursion_level = 0
-@object_recorder = {}
 #
 # @print_nil_values can be used to toggle whether or not to include keys that have a nil value in the
 # output dump. There are often many, and including them will usually increase verbosity, but it is
 # sometimes useful to know that a key/attribute exists, even if it currently has no assigned value.
 #
 @print_nil_values = false
-@debug = false
 #
 # @walk_association_policy should have the value of either :whitelist or :blacklist. This will determine whether we either 
 # walk all associations _except_ those in the @walk_association_blacklist hash, or _only_ the associations in the
