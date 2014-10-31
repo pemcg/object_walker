@@ -12,10 +12,11 @@
 # Original      1.0     18-Sep-2014
 #               1.1     22-Sep-2014     Added blacklisting/whitelisting to the walk_association functionality
 #               1.2     24-Sep-2014     Changed exception handling logic slightly
-#               1.3     25-Sep-2015     Debugged exception handling, changed some output strings
+#               1.3     25-Sep-2014     Debugged exception handling, changed some output strings
+#               1.4     31-Oct-2014     Added dump_methods
 #   
 @method = 'objectWalker'
-VERSION = 1.3
+VERSION = 1.4
 #
 @recursion_level = 0
 @object_recorder = {}
@@ -75,40 +76,40 @@ $evm.log("info", "#{@method} #{VERSION} - EVM Automate Method Started")
 # Purpose:      Dump the attributes of an object
 # Arguments:    object_string : 
 #               this_object
-#               spaces
+#               indent_string
 # Returns:      None
 #-------------------------------------------------------------------------------------------------------------
-def dump_attributes(object_string, this_object, spaces)
+def dump_attributes(object_string, this_object, indent_string)
   begin
     #
     # Print the attributes of this object
     #
     if this_object.respond_to?(:attributes)
-      $evm.log("info", "#{spaces}#{@method}:   Debug: this_object.inspected = #{this_object.inspect}") if @debug
+      $evm.log("info", "#{indent_string}#{@method}:   Debug: this_object.inspected = #{this_object.inspect}") if @debug
       this_object.attributes.sort.each do |key, value|
         if key != "options"
           if value.is_a?(DRb::DRbObject)
-            $evm.log("info", "#{spaces}#{@method}:   #{object_string}[\'#{key}\'] => #{value}   (type: #{value.class})")
-            dump_object("#{object_string}[\'#{key}\']", value, spaces)
+            $evm.log("info", "#{indent_string}#{@method}:   #{object_string}[\'#{key}\'] => #{value}   (type: #{value.class})")
+            dump_object("#{object_string}[\'#{key}\']", value, indent_string)
           else
             if value.nil?
-              $evm.log("info", "#{spaces}#{@method}:   #{object_string}.#{key} = nil") if @print_nil_values
+              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = nil") if @print_nil_values
             else
-              $evm.log("info", "#{spaces}#{@method}:   #{object_string}.#{key} = #{value}   (type: #{value.class})")
+              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = #{value}   (type: #{value.class})")
             end
           end
         else
           value.sort.each do |k,v|
             if v.nil?
-              $evm.log("info", "#{spaces}#{@method}:   #{object_string}.options[:#{k}] = nil") if @print_nil_values
+              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.options[:#{k}] = nil") if @print_nil_values
             else
-              $evm.log("info", "#{spaces}#{@method}:   #{object_string}.options[:#{k}] = #{v}   (type: #{v.class})")
+              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.options[:#{k}] = #{v}   (type: #{v.class})")
             end
           end
         end
       end
     else
-      $evm.log("info", "#{spaces}#{@method}:   This object has no attributes")
+      $evm.log("info", "#{indent_string}#{@method}:   This object has no attributes")
     end
   rescue => err
     $evm.log("error", "#{@method} (dump_attributes) - [#{err}]\n#{err.backtrace.join("\n")}")
@@ -122,33 +123,35 @@ end
 #-------------------------------------------------------------------------------------------------------------
 # Method:       dump_virtual_columns
 # Purpose:      Dumps the virtual_columns_names of the object passed to it
-# Arguments:    object_string : friendly text string name for the object
-#               this_object   : the Ruby object whose virtual_column_names are to be dumped
+# Arguments:    object_string     : friendly text string name for the object
+#               this_object       : the Ruby object whose virtual_column_names are to be dumped
 #               this_object_class : the class of the object whose associations are to be dumped
-#               spaces        : the number of spaces to indent the output (corresponds to recursion depth)
+#               indent_string     : the string to use to indent the output (represents recursion depth)
 # Returns:      None
 #-------------------------------------------------------------------------------------------------------------
 
-def dump_virtual_columns(object_string, this_object, this_object_class, spaces)
+def dump_virtual_columns(object_string, this_object, this_object_class, indent_string)
   begin
     #
     # Print the virtual columns of this object 
     #
     if this_object.respond_to?(:virtual_column_names)
-      $evm.log("info", "#{spaces}#{@method}:   --- virtual columns follow ---")
+      $evm.log("info", "#{indent_string}#{@method}:   --- virtual columns follow ---")
       this_object.virtual_column_names.sort.each do |virtual_column_name|
         begin
           virtual_column_value = this_object.send(virtual_column_name)
           if virtual_column_value.nil?
-            $evm.log("info", "#{spaces}#{@method}:   #{object_string}.#{virtual_column_name} = nil") if @print_nil_values
+            $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{virtual_column_name} = nil") if @print_nil_values
           else
-            $evm.log("info", "#{spaces}#{@method}:   #{object_string}.#{virtual_column_name} = #{virtual_column_value}   (type: #{virtual_column_value.class})")
+            $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{virtual_column_name} = #{virtual_column_value}   (type: #{virtual_column_value.class})")
           end
         rescue NoMethodError
-          $evm.log("info", "#{spaces}#{@method}:   *** #{this_object_class} virtual column: \'#{virtual_column_name}\' gives a NoMethodError when accessed (product bug?) ***")
+          $evm.log("info", "#{indent_string}#{@method}:   *** #{this_object_class} virtual column: \'#{virtual_column_name}\' gives a NoMethodError when accessed (product bug?) ***")
         end
       end
-      $evm.log("info", "#{spaces}#{@method}:   --- end of virtual columns ---")
+      $evm.log("info", "#{indent_string}#{@method}:   --- end of virtual columns ---")
+    else
+      $evm.log("info", "#{indent_string}#{@method}:   This object has no virtual columns")
     end
   rescue => err
     $evm.log("error", "#{@method} (dump_virtual_columns) - [#{err}]\n#{err.backtrace.join("\n")}")
@@ -165,11 +168,11 @@ end
 # Arguments:    object_string       : friendly text string name for the object
 #               association         : friendly text string name for the association
 #               associated_objects  : the list of objects in the association
-#               spaces              : the number of spaces to indent the output (corresponds to recursion depth)
+#               indent_string       : the string to use to indent the output (represents recursion depth)
 # Returns:      None
 #-------------------------------------------------------------------------------------------------------------
 
-def dump_association(object_string, association, associated_objects, spaces)
+def dump_association(object_string, association, associated_objects, indent_string)
   begin
     #
     # Assemble some fake code to make it look like we're iterating though associations (plural)
@@ -180,21 +183,21 @@ def dump_association(object_string, association, associated_objects, spaces)
     else
       assignment_string = "#{association} = #{object_string}.#{association}"
     end
-    $evm.log("info", "#{spaces}#{@method}:   #{assignment_string}")
+    $evm.log("info", "#{indent_string}#{@method}:   #{assignment_string}")
     associated_objects.each do |associated_object|
       associated_object_class = "#{associated_object.method_missing(:class)}".demodulize
       associated_object_id = associated_object.id rescue associated_object.object_id
-      $evm.log("info", "#{spaces}|    #{@method}:   (object type: #{associated_object_class}, object ID: #{associated_object_id})")
+      $evm.log("info", "#{indent_string}|    #{@method}:   (object type: #{associated_object_class}, object ID: #{associated_object_id})")
       if (association =~ /.*s$/)
-        dump_object("#{association.chop}", associated_object, spaces)
+        dump_object("#{association.chop}", associated_object, indent_string)
         if number_of_associated_objects > 1
-          $evm.log("info", "#{spaces}#{@method}:   --- next #{association.chop} ---")
+          $evm.log("info", "#{indent_string}#{@method}:   --- next #{association.chop} ---")
           number_of_associated_objects -= 1
         else
-          $evm.log("info", "#{spaces}#{@method}:   --- end of #{object_string}.#{association}.each do |#{association.chop}| ---")
+          $evm.log("info", "#{indent_string}#{@method}:   --- end of #{object_string}.#{association}.each do |#{association.chop}| ---")
         end
       else
-        dump_object("#{association}", associated_object, spaces)
+        dump_object("#{association}", associated_object, indent_string)
       end
     end
   rescue => err
@@ -212,11 +215,11 @@ end
 # Arguments:    object_string     : friendly text string name for the object
 #               this_object       : the Ruby object whose associations are to be dumped
 #               this_object_class : the class of the object whose associations are to be dumped
-#               spaces            : the number of spaces to indent the output (corresponds to recursion depth)
+#               indent_string     : the string to use to indent the output (represents recursion depth)
 # Returns:      None
 #-------------------------------------------------------------------------------------------------------------
 
-def dump_associations(object_string, this_object, this_object_class, spaces)
+def dump_associations(object_string, this_object, this_object_class, indent_string)
   begin
     #
     # Print the associations of this object according to the @walk_associations_whitelist & @walk_associations_blacklist hashes
@@ -224,44 +227,44 @@ def dump_associations(object_string, this_object, this_object_class, spaces)
     object_associations = []
     associated_objects = []
     if this_object.respond_to?(:associations)
-      $evm.log("info", "#{spaces}#{@method}:   --- associations follow ---")
+      $evm.log("info", "#{indent_string}#{@method}:   --- associations follow ---")
       object_associations = Array(this_object.associations)
       object_associations.sort.each do |association|
         begin
           associated_objects = Array(this_object.send(association))
           if associated_objects.length == 0
-            $evm.log("info", "#{spaces}#{@method}:   #{object_string}.#{association} (type: Association (empty))")
+            $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{association} (type: Association (empty))")
           else
-            $evm.log("info", "#{spaces}#{@method}:   #{object_string}.#{association} (type: Association)")
+            $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{association} (type: Association)")
             #
             # See if we need to walk this association according to the @walk_association_policy variable, and the @walk_association_{whitelist,clacklist} hashes
             #
             if @walk_association_policy == :whitelist
               if @walk_association_whitelist.has_key?(this_object_class) &&
                   (@walk_association_whitelist[this_object_class].include?(:ALL) || @walk_association_whitelist[this_object_class].include?(association.to_s))
-                dump_association(object_string, association, associated_objects, spaces)
+                dump_association(object_string, association, associated_objects, indent_string)
               else
-                $evm.log("info", "#{spaces}#{@method}:   *** not walking: \'#{association}\' isn't in the @walk_association_whitelist hash for #{this_object_class} ***")
+                $evm.log("info", "#{indent_string}#{@method}:   *** not walking: \'#{association}\' isn't in the @walk_association_whitelist hash for #{this_object_class} ***")
               end
             elsif @walk_association_policy == :blacklist
               if @walk_association_blacklist.has_key?(this_object_class) &&
                   (@walk_association_blacklist[this_object_class].include?(:ALL) || @walk_association_blacklist[this_object_class].include?(association.to_s))
-                $evm.log("info", "#{spaces}#{@method}:   *** not walking: \'#{association}\' is in the @walk_association_blacklist hash for #{this_object_class} ***")
+                $evm.log("info", "#{indent_string}#{@method}:   *** not walking: \'#{association}\' is in the @walk_association_blacklist hash for #{this_object_class} ***")
               else
-                dump_association(object_string, association, associated_objects, spaces)
+                dump_association(object_string, association, associated_objects, indent_string)
               end
             else
-              $evm.log("info", "#{spaces}#{@method}:   *** Invalid @walk_association_policy: #{@walk_association_policy} ***")
+              $evm.log("info", "#{indent_string}#{@method}:   *** Invalid @walk_association_policy: #{@walk_association_policy} ***")
               exit MIQ_ABORT
             end
           end
         rescue NoMethodError
-          $evm.log("info", "#{spaces}#{@method}:   *** #{this_object_class} association: \'#{association}\', gives a NoMethodError when accessed (product bug?) ***")
+          $evm.log("info", "#{indent_string}#{@method}:   *** #{this_object_class} association: \'#{association}\', gives a NoMethodError when accessed (product bug?) ***")
         end
       end
-      $evm.log("info", "#{spaces}#{@method}:   --- end of associations ---")
+      $evm.log("info", "#{indent_string}#{@method}:   --- end of associations ---")
     else
-      $evm.log("info", "#{spaces}#{@method}:   This object has no associations")
+      $evm.log("info", "#{indent_string}#{@method}:   This object has no associations")
     end
   rescue => err
     $evm.log("error", "#{@method} (dump_associations) - [#{err}]\n#{err.backtrace.join("\n")}")
@@ -273,27 +276,99 @@ end
 
 
 #-------------------------------------------------------------------------------------------------------------
+# Method:       dump_methods
+# Purpose:      Dumps the methods (if any) of the object class passed to it
+# Arguments:    object_string     : friendly text string name for the object
+#               this_object       : the Ruby object whose methods are to be dumped
+#               indent_string     : the string to use to indent the output (represents recursion depth)
+# Returns:      None
+#-------------------------------------------------------------------------------------------------------------
+
+def dump_methods(object_string, this_object, indent_string)
+  begin
+    unless object_string == "$evm.root"
+      $evm.log("info", "#{indent_string}#{@method}:   Class of remote DRb::DRbObject is: #{this_object.method_missing(:class)}") if @debug
+      #
+      # Get the instance methods of the class and convert to string
+      #
+      if this_object.method_missing(:class).respond_to?(:instance_methods)
+        instance_methods = this_object.method_missing(:class).instance_methods.map { |x| x.to_s }
+        #
+        # Now we need to remove method names that we're not interested in...
+        #
+        # ...attribute names...
+        #
+        attributes = []
+        if this_object.respond_to?(:attributes)
+          this_object.attributes.sort.each do |key, value|
+            attributes << key
+          end
+        end
+        attributes << "attributes"
+        instance_methods = instance_methods - attributes
+        #
+        # ...association names...
+        #
+        associations = []
+        if this_object.respond_to?(:associations)
+          associations = Array(this_object.associations)
+        end
+        associations << "associations"
+        instance_methods = instance_methods - associations
+        #
+        # ...virtual column names...
+        #
+        virtual_column_names = []
+        virtual_column_names = this_object.method_missing(:virtual_column_names)
+        virtual_column_names << "virtual_column_names"
+        instance_methods = instance_methods - virtual_column_names
+        #
+        # ...methods of a DRb::DRbObject class and its superclasses...
+        #
+        drb_methods = this_object.class.methods.map { |x| x.to_s }
+        instance_methods = instance_methods - drb_methods
+        #
+        # and finally dump out the remainder
+        #
+        $evm.log("info", "#{indent_string}#{@method}:   --- instance methods follow ---")
+        instance_methods.sort.each do | instance_method |
+          $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{instance_method}")
+        end
+        $evm.log("info", "#{indent_string}#{@method}:   --- end of instance methods ---")
+      else
+        $evm.log("info", "#{indent_string}#{@method}:   This object has no instance methods")
+      end
+    end
+  rescue => err
+    $evm.log("error", "#{@method} (dump_methods) - [#{err}]\n#{err.backtrace.join("\n")}")
+  end
+end
+# End of dump_methods
+#-------------------------------------------------------------------------------------------------------------
+
+
+#-------------------------------------------------------------------------------------------------------------
 # Method:       dump_object
 # Purpose:      Dumps the object passed to it
 # Arguments:    object_string : friendly text string name for the object
 #               this_object   : the Ruby object to be dumped
-#               spaces        : the number of spaces to indent the output (corresponds to recursion depth)
+#               indent_string     : the string to use to indent the output (represents recursion depth)
 # Returns:      None
 #-------------------------------------------------------------------------------------------------------------
 
-def dump_object(object_string, this_object, spaces)
+def dump_object(object_string, this_object, indent_string)
   begin
     if @recursion_level == 0
-      spaces += "     "
+      indent_string += "     "
     else
-      spaces += "|    "
+      indent_string += "|    "
     end
     #
     # Make sure that we don't exceed our maximum recursion level
     #
     @recursion_level += 1
     if @recursion_level > MAX_RECURSION_LEVEL
-      $evm.log("info", "#{spaces}#{@method}:   *** exceeded maximum recursion level ***")
+      $evm.log("info", "#{indent_string}#{@method}:   *** exceeded maximum recursion level ***")
       @recursion_level -= 1
       return
     end
@@ -301,12 +376,12 @@ def dump_object(object_string, this_object, spaces)
     # Make sure we haven't dumped this object already (some data structure links are cyclical)
     #
     this_object_id = this_object.id.to_s rescue this_object.object_id.to_s
-    $evm.log("info", "#{spaces}#{@method}:   Debug: this_object.method_missing(:class) = #{this_object.method_missing(:class)}}") if @debug
+    $evm.log("info", "#{indent_string}#{@method}:   Debug: this_object.method_missing(:class) = #{this_object.method_missing(:class)}") if @debug
     this_object_class = "#{this_object.method_missing(:class)}".demodulize
-    $evm.log("info", "#{spaces}#{@method}:   Debug: this_object_class = #{this_object_class}") if @debug
+    $evm.log("info", "#{indent_string}#{@method}:   Debug: this_object_class = #{this_object_class}") if @debug
     if @object_recorder.key?(this_object_class)
       if @object_recorder[this_object_class].include?(this_object_id)
-        $evm.log("info", "#{spaces}#{@method}:   Object #{this_object_class} with ID #{this_object_id} has already been dumped...")
+        $evm.log("info", "#{indent_string}#{@method}:   Object #{this_object_class} with ID #{this_object_id} has already been dumped...")
         @recursion_level -= 1
         return
       else
@@ -317,13 +392,14 @@ def dump_object(object_string, this_object, spaces)
       @object_recorder[this_object_class] << this_object_id
     end
     
-    $evm.log("info", "#{spaces}#{@method}:   Dumping $evm.root") if @recursion_level == 1
+    $evm.log("info", "#{indent_string}#{@method}:   Dumping $evm.root") if @recursion_level == 1
     #
     # Dump out the things of interest
     #
-    dump_attributes(object_string, this_object, spaces)
-    dump_virtual_columns(object_string, this_object, this_object_class, spaces)
-    dump_associations(object_string, this_object, this_object_class, spaces)
+    dump_attributes(object_string, this_object, indent_string)
+    dump_virtual_columns(object_string, this_object, this_object_class, indent_string)
+    dump_associations(object_string, this_object, this_object_class, indent_string)
+    dump_methods(object_string, this_object, indent_string)
   
     @recursion_level -= 1
   rescue => err
