@@ -14,11 +14,11 @@
 #               1.2     24-Sep-2014     Changed exception handling logic slightly
 #               1.3     25-Sep-2014     Debugged exception handling, changed some output strings
 #               1.4     15-Feb-2015     Added dump_methods, renamed to object_walker
-#               1.41    19-Feb-2015     Changed singular/plural detection code in dump_association to use active_support/core_ext/string
+#               1.4-1   19-Feb-2015     Changed singular/plural detection code in dump_association to use active_support/core_ext/string
 #
 require 'active_support/core_ext/string'
 @method = 'object_walker'
-VERSION = 1.41
+VERSION = "1.4-1"
 #
 @recursion_level = 0
 @object_recorder = {}
