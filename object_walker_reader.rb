@@ -45,14 +45,14 @@
 #      |    object_walker:   $evm.root['miq_server'].ipaddress = 192.168.2.77   (type: String)
 # ... 
 #
-# Author:	Peter McGowan (pemcg@redhat.com)
+# Author: Peter McGowan (pemcg@redhat.com)
 #           Copyright 2014 Peter McGowan, Red Hat
 #
 # Revision History
 #
 # Original      1.0     18-Sep-2014
-#								1.1			16-Feb-2015			Updated to change name change from objectWalker to object_walker
-#								1.1-1		19-Feb-2015			Changed the object_walker_start_re regex to allow for maj.min-up
+#               1.1     16-Feb-2015     Updated to change name change from objectWalker to object_walker
+#               1.1-1   19-Feb-2015     Changed the object_walker_start_re regex to allow for maj.min-up
 #  
 
 require 'optparse'
@@ -60,20 +60,20 @@ require 'optparse'
 options = {:list => false, :filename => nil, :timestamp => nil}
 
 parser = OptionParser.new do|opts|
-	opts.banner = "Usage: object_walker_reader.rb [options]"
-	opts.on('-l', '--list', 'list object_walker dumps in the file') do
-		options[:list] = true;
-	end
-	opts.on('-f', '--file filename', 'Full file path to automation.log (if not /var/www/miq/vmdb/log/automtion.log)') do |filename|
-		options[:filename] = filename;
-	end
-	opts.on('-t', '--timestamp timestamp', 'Date/time of the object_walker dump to be listed (hint: copy from -l output)') do |timestamp|
-		options[:timestamp] = timestamp;
-	end
-	opts.on('-h', '--help', 'Displays Help') do
-		puts opts
-		exit
-	end
+  opts.banner = "Usage: object_walker_reader.rb [options]"
+  opts.on('-l', '--list', 'list object_walker dumps in the file') do
+    options[:list] = true;
+  end
+  opts.on('-f', '--file filename', 'Full file path to automation.log (if not /var/www/miq/vmdb/log/automtion.log)') do |filename|
+    options[:filename] = filename;
+  end
+  opts.on('-t', '--timestamp timestamp', 'Date/time of the object_walker dump to be listed (hint: copy from -l output)') do |timestamp|
+    options[:timestamp] = timestamp;
+  end
+  opts.on('-h', '--help', 'Displays Help') do
+    puts opts
+    exit
+  end
 end
 parser.parse!
 
