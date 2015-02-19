@@ -32,10 +32,15 @@ MAX_RECURSION_LEVEL = 7
 #
 @print_nil_values = false
 #
-# @dump_methods defines whether or not we dump the methods of each object that we encounter. If we are dumping methods
-# of each object then we need to record the instance methods of the MiqAeMethodService::MiqAeServiceModelBase class.
+# @dump_methods defines whether or not we dump the methods of each object that we encounter. We only dump the methods
+# of the object and its superclasses up to but not including the methods of MiqAeMethodService::MiqAeServiceModelBase.
+# For actual usage of the methods, expected arguments, etc., consult the code itself (or documentation).
 #
 @dump_methods = true
+#
+# We need to record the instance methods of the MiqAeMethodService::MiqAeServiceModelBase class so that we can
+# subtract this list from the methods we discover for each object
+#
 @service_mode_base_instance_methods = []
 #
 # @walk_association_policy should have the value of either :whitelist or :blacklist. This will determine whether we either 
@@ -419,21 +424,31 @@ end
 # End of dump_object
 #-------------------------------------------------------------------------------------------------------------
 
-#
-# Start with the root object
-#
+# -------------------------------------------- Start of main code --------------------------------------------
+
 if @dump_methods
   #
   # If we're dumping object methods, then we need to find out the methods of the MiqAeMethodService::MiqAeServiceModelBase class
   # so that we can subtract them from the method list returned from each object. We know that MiqAeServiceModelBase is the superclass
   # of MiqAeMethodService::MiqAeServiceUser, so we can get what we're after via $evm.root['user']
   #
-  user = $evm.root['user']
-  if user.method_missing(:class).superclass.name == "MiqAeMethodService::MiqAeServiceModelBase"
-    @service_mode_base_instance_methods = user.method_missing(:class).superclass.instance_methods.map { |x| x.to_s }
+
+  user = $evm.root['user'] rescue nil
+  unless user.nil?
+    if user.method_missing(:class).superclass.name == "MiqAeMethodService::MiqAeServiceModelBase"
+      @service_mode_base_instance_methods = user.method_missing(:class).superclass.instance_methods.map { |x| x.to_s }
+    else
+      $evm.log("error", "#{@method} Unexpected parent class of $evm.root['user']: #{user.method_missing(:class).superclass.name}")
+      @dump_methods = false
+    end
+  else
+    $evm.log("error", "#{@method} $evm.root['user'] doesn't exist")
+    @dump_methods = false
   end
 end
-
+#
+# Start with the root object
+#
 dump_object("$evm.root", $evm.root, "")
 #
 # Exit method
