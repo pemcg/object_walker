@@ -14,9 +14,11 @@
 #               1.2     24-Sep-2014     Changed exception handling logic slightly
 #               1.3     25-Sep-2014     Debugged exception handling, changed some output strings
 #               1.4     15-Feb-2015     Added dump_methods, renamed to object_walker
-#   
+#               1.41    19-Feb-2015     Changed singular/plural detection code in dump_association to use active_support/core_ext/string
+#
+require 'active_support/core_ext/string'
 @method = 'object_walker'
-VERSION = 1.4
+VERSION = 1.41
 #
 @recursion_level = 0
 @object_recorder = {}
@@ -172,6 +174,16 @@ end
 # End of dump_virtual_columns
 #-------------------------------------------------------------------------------------------------------------
 
+#-------------------------------------------------------------------------------------------------------------
+# Method:       is_plural?
+# Purpose:      Test whather a string is plural (as opposed to singular)
+# Arguments:    astring: text string to be tested
+# Returns:      Boolean
+#-------------------------------------------------------------------------------------------------------------
+
+def is_plural?(astring)
+	astring.singularize != astring
+end
 
 #-------------------------------------------------------------------------------------------------------------
 # Method:       dump_association
@@ -189,8 +201,8 @@ def dump_association(object_string, association, associated_objects, indent_stri
     # Assemble some fake code to make it look like we're iterating though associations (plural)
     #
     number_of_associated_objects = associated_objects.length
-    if (association =~ /.*s$/)
-      assignment_string = "#{object_string}.#{association}.each do |#{association.chop}|"
+    if is_plural?(association)
+      assignment_string = "#{object_string}.#{association}.each do |#{association.singularize}|"
     else
       assignment_string = "#{association} = #{object_string}.#{association}"
     end
@@ -199,13 +211,13 @@ def dump_association(object_string, association, associated_objects, indent_stri
       associated_object_class = "#{associated_object.method_missing(:class)}".demodulize
       associated_object_id = associated_object.id rescue associated_object.object_id
       $evm.log("info", "#{indent_string}|    #{@method}:   (object type: #{associated_object_class}, object ID: #{associated_object_id})")
-      if (association =~ /.*s$/)
-        dump_object("#{association.chop}", associated_object, indent_string)
+      if is_plural?(association)
+        dump_object("#{association.singularize}", associated_object, indent_string)
         if number_of_associated_objects > 1
-          $evm.log("info", "#{indent_string}#{@method}:   --- next #{association.chop} ---")
+          $evm.log("info", "#{indent_string}#{@method}:   --- next #{association.singularize} ---")
           number_of_associated_objects -= 1
         else
-          $evm.log("info", "#{indent_string}#{@method}:   --- end of #{object_string}.#{association}.each do |#{association.chop}| ---")
+          $evm.log("info", "#{indent_string}#{@method}:   --- end of #{object_string}.#{association}.each do |#{association.singularize}| ---")
         end
       else
         dump_object("#{association}", associated_object, indent_string)
@@ -432,7 +444,6 @@ if @dump_methods
   # so that we can subtract them from the method list returned from each object. We know that MiqAeServiceModelBase is the superclass
   # of MiqAeMethodService::MiqAeServiceUser, so we can get what we're after via $evm.root['user']
   #
-
   user = $evm.root['user'] rescue nil
   unless user.nil?
     if user.method_missing(:class).superclass.name == "MiqAeMethodService::MiqAeServiceModelBase"
