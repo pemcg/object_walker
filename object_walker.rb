@@ -15,10 +15,11 @@
 #               1.3     25-Sep-2014     Debugged exception handling, changed some output strings
 #               1.4     15-Feb-2015     Added dump_methods, renamed to object_walker
 #               1.4-1   19-Feb-2015     Changed singular/plural detection code in dump_association to use active_support/core_ext/string
+#               1.4-2   27-Feb-2015     Dump some $evm attributes first, and print the URI for an object type of DRb::DRbObject
 #
 require 'active_support/core_ext/string'
 @method = 'object_walker'
-VERSION = "1.4-1"
+VERSION = "1.4-2"
 #
 @recursion_level = 0
 @object_recorder = {}
@@ -66,7 +67,8 @@ MAX_RECURSION_LEVEL = 7
                                 "MiqAeServiceServiceResource" => ["resource", "service_template"],
                                 "MiqAeServiceMiqProvisionRequest" => ["miq_request", "miq_request_tasks"],
                                 "MiqAeServiceMiqProvisionRequestTemplate" => ["miq_request", "miq_request_tasks"],
-                                "MiqAeServiceMiqProvisionVmware" => ["source", "destination", "miq_provision_request", "miq_request", "miq_request_task", "vm"],
+                                "MiqAeServiceMiqProvisionVmware" => ["source", "destination", "miq_provision_request", "miq_request", "miq_request_task", "vm", \
+                                                                     "vm_template"],
                                 "MiqAeServiceMiqProvisionRedhat" => [:ALL],
                                 "MiqAeServiceMiqProvisionRedhatViaPxe" => [:ALL],
                                 "MiqAeServiceVmVmware" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware"],
@@ -82,7 +84,25 @@ MAX_RECURSION_LEVEL = 7
                                 "MiqAeServiceHostRedhat" => ["guest_applications", "ems_events"]}
 
 
-$evm.log("info", "#{@method} #{VERSION} - EVM Automate Method Started")
+#-------------------------------------------------------------------------------------------------------------
+# Method:       type
+# Purpose:      Returns a string containing the type of the object passed as an argument
+# Arguments:    object: object to be type tested
+# Returns:      string
+#-------------------------------------------------------------------------------------------------------------
+
+def type(object)
+  if object.is_a?(DRb::DRbObject)
+    string = "(type: #{object.class}, URI: #{object.__drburi()})"
+  else
+    string = "(type: #{object.class})"
+  end
+  return string
+end
+
+# End of type
+#-------------------------------------------------------------------------------------------------------------
+
 
 #-------------------------------------------------------------------------------------------------------------
 # Method:       dump_attributes
@@ -102,13 +122,13 @@ def dump_attributes(object_string, this_object, indent_string)
       this_object.attributes.sort.each do |key, value|
         if key != "options"
           if value.is_a?(DRb::DRbObject)
-            $evm.log("info", "#{indent_string}#{@method}:   #{object_string}[\'#{key}\'] => #{value}   (type: #{value.class})")
+            $evm.log("info", "#{indent_string}#{@method}:   #{object_string}[\'#{key}\'] => #{value}   #{type(value)}")
             dump_object("#{object_string}[\'#{key}\']", value, indent_string)
           else
             if value.nil?
               $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = nil") if @print_nil_values
             else
-              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = #{value}   (type: #{value.class})")
+              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = #{value}   #{type(value)}")
             end
           end
         else
@@ -116,7 +136,7 @@ def dump_attributes(object_string, this_object, indent_string)
             if v.nil?
               $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.options[:#{k}] = nil") if @print_nil_values
             else
-              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.options[:#{k}] = #{v}   (type: #{v.class})")
+              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.options[:#{k}] = #{v}   #{type(v)}")
             end
           end
         end
@@ -156,7 +176,7 @@ def dump_virtual_columns(object_string, this_object, this_object_class, indent_s
           if virtual_column_value.nil?
             $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{virtual_column_name} = nil") if @print_nil_values
           else
-            $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{virtual_column_name} = #{virtual_column_value}   (type: #{virtual_column_value.class})")
+            $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{virtual_column_name} = #{virtual_column_value}   #{type(virtual_column_value)}")
           end
         rescue NoMethodError
           $evm.log("info", "#{indent_string}#{@method}:   *** #{this_object_class} virtual column: \'#{virtual_column_name}\' gives a NoMethodError when accessed (product bug?) ***")
@@ -184,6 +204,9 @@ end
 def is_plural?(astring)
   astring.singularize != astring
 end
+
+# End of is_plural?
+#-------------------------------------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------------------------------------
 # Method:       dump_association
@@ -418,7 +441,7 @@ def dump_object(object_string, this_object, indent_string)
       @object_recorder[this_object_class] << this_object_id
     end
     
-    $evm.log("info", "#{indent_string}#{@method}:   Dumping $evm.root") if @recursion_level == 1
+    #$evm.log("info", "#{indent_string}#{@method}:   Dumping $evm.root") if @recursion_level == 1
     #
     # Dump out the things of interest
     #
@@ -437,6 +460,8 @@ end
 #-------------------------------------------------------------------------------------------------------------
 
 # -------------------------------------------- Start of main code --------------------------------------------
+
+$evm.log("info", "#{@method} #{VERSION} - EVM Automate Method Started")
 
 if @dump_methods
   #
@@ -458,7 +483,20 @@ if @dump_methods
   end
 end
 #
-# Start with the root object
+# Start with a few $evm attributes
+#
+$evm.log("info", "     #{@method}:   $evm.current_namespace = #{$evm.current_namespace}   #{type($evm.current_namespace)}")
+$evm.log("info", "     #{@method}:   $evm.current_class = #{$evm.current_class}   #{type($evm.current_class)}")
+$evm.log("info", "     #{@method}:   $evm.current_instance = #{$evm.current_instance}   #{type($evm.current_instance)}")
+$evm.log("info", "     #{@method}:   $evm.current_message = #{$evm.current_message}   #{type($evm.current_message)}")
+$evm.log("info", "     #{@method}:   $evm.current_object = #{$evm.current_object}   #{type($evm.current_object)}")
+$evm.log("info", "     #{@method}:   $evm.current_object.current_field_name = #{$evm.current_object.current_field_name}   #{type($evm.current_object.current_field_name)}")
+$evm.log("info", "     #{@method}:   $evm.current_object.current_field_type = #{$evm.current_object.current_field_type}   #{type($evm.current_object.current_field_type)}")
+$evm.log("info", "     #{@method}:   $evm.current_method = #{$evm.current_method}   #{type($evm.current_method)}")
+$evm.log("info", "     #{@method}:   $evm.parent = #{$evm.parent}   #{type($evm.parent)}")
+$evm.log("info", "     #{@method}:   $evm.root = #{$evm.root}   #{type($evm.root)}")
+#
+# and then dump $evm.root
 #
 dump_object("$evm.root", $evm.root, "")
 #
