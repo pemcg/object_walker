@@ -53,6 +53,7 @@
 # Original      1.0     18-Sep-2014
 #               1.1     16-Feb-2015     Updated to change name change from objectWalker to object_walker
 #               1.1-1   19-Feb-2015     Changed the object_walker_start_re regex to allow for maj.min-up
+#               1.1-2   08-Feb-2015     Changed the regexes to search for 'objectWalker' or 'object_walker'
 #  
 
 require 'optparse'
@@ -82,8 +83,8 @@ if options[:timestamp] && options[:list]
   exit!
 end
 
-object_walker_start_re = /----\] I, \[(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}) .*object_walker .* - EVM Automate Method Started/
-object_walker_re = /.*(AEMethod object_walker|Defined Method)\> (.*)/
+object_walker_start_re = /----\] I, \[(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}) .*[Oo]bject_*[Ww]alker .* - EVM Automate Method Started/
+object_walker_re = /.*(AEMethod [Oo]bject_*[Ww]alker|Defined Method)\> (.*)/
 
 dump_start = 0
 
