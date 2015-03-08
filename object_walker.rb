@@ -16,10 +16,12 @@
 #               1.4     15-Feb-2015     Added dump_methods, renamed to object_walker
 #               1.4-1   19-Feb-2015     Changed singular/plural detection code in dump_association to use active_support/core_ext/string
 #               1.4-2   27-Feb-2015     Dump some $evm attributes first, and print the URI for an object type of DRb::DRbObject
+#               1.4-3   02-Mar-2015     Detect duplicate entries in the associations list for each object
+#               1.4-4   08-Mar-2015     Walk $evm.parent after $evm.root
 #
 require 'active_support/core_ext/string'
 @method = 'object_walker'
-VERSION = "1.4-2"
+VERSION = "1.4-4"
 #
 @recursion_level = 0
 @object_recorder = {}
@@ -65,15 +67,18 @@ MAX_RECURSION_LEVEL = 7
 @walk_association_whitelist = { "MiqAeServiceServiceTemplateProvisionTask" => ["source", "destination", "miq_request", "miq_request_tasks", "service_resource"],
                                 "MiqAeServiceServiceTemplate" => ["service_resources"],
                                 "MiqAeServiceServiceResource" => ["resource", "service_template"],
-                                "MiqAeServiceMiqProvisionRequest" => ["miq_request", "miq_request_tasks"],
+                                "MiqAeServiceMiqProvisionRequest" => ["miq_request", "miq_request_tasks","eligible_clusters", "eligible_hosts", \
+                                                                      "eligible_storages", "miq_provisions", "requester", "resource", "source", "vm_template"],
                                 "MiqAeServiceMiqProvisionRequestTemplate" => ["miq_request", "miq_request_tasks"],
                                 "MiqAeServiceMiqProvisionVmware" => ["source", "destination", "miq_provision_request", "miq_request", "miq_request_task", "vm", \
                                                                      "vm_template"],
                                 "MiqAeServiceMiqProvisionRedhat" => [:ALL],
                                 "MiqAeServiceMiqProvisionRedhatViaPxe" => [:ALL],
-                                "MiqAeServiceVmVmware" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware"],
+                                "MiqAeServiceVmVmware" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware", \
+                                                           "operating_system"],
                                 "MiqAeServiceVmRedhat" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware"],
-                                "MiqAeServiceHardware" => ["nics"]}
+                                "MiqAeServiceHardware" => ["nics", "guest_devices", "ports", "vm" ],
+                                "MiqAeServiceGuestDevice" => ["hardware", "lan", "network"]}
 #
 # if @walk_association_policy = :blacklist, then objectWalker will traverse all associations of all objects, except those
 # that are explicitly mentioned in the @walk_association_blacklist hash. This enables us to run a more exploratory dump, at the cost of a
@@ -142,7 +147,7 @@ def dump_attributes(object_string, this_object, indent_string)
         end
       end
     else
-      $evm.log("info", "#{indent_string}#{@method}:   This object has no attributes")
+      $evm.log("info", "#{indent_string}#{@method}:   #{object_string} has no attributes")
     end
   rescue => err
     $evm.log("error", "#{@method} (dump_attributes) - [#{err}]\n#{err.backtrace.join("\n")}")
@@ -184,7 +189,7 @@ def dump_virtual_columns(object_string, this_object, this_object_class, indent_s
       end
       $evm.log("info", "#{indent_string}#{@method}:   --- end of virtual columns ---")
     else
-      $evm.log("info", "#{indent_string}#{@method}:   This object has no virtual columns")
+      $evm.log("info", "#{indent_string}#{@method}:   #{object_string} has no virtual columns")
     end
   rescue => err
     $evm.log("error", "#{@method} (dump_virtual_columns) - [#{err}]\n#{err.backtrace.join("\n")}")
@@ -272,10 +277,15 @@ def dump_associations(object_string, this_object, this_object_class, indent_stri
     #
     object_associations = []
     associated_objects = []
+    duplicates = []
     if this_object.respond_to?(:associations)
       $evm.log("info", "#{indent_string}#{@method}:   --- associations follow ---")
       object_associations = Array(this_object.associations)
-      object_associations.sort.each do |association|
+      duplicates = object_associations.select{|item| object_associations.count(item) > 1}
+      if duplicates.length > 0
+        $evm.log("info", "#{indent_string}#{@method}:   *** De-duplicating the following associations: #{duplicates.inspect} (product bug?) ***")
+      end
+      object_associations.uniq.sort.each do |association|
         begin
           associated_objects = Array(this_object.send(association))
           if associated_objects.length == 0
@@ -283,7 +293,7 @@ def dump_associations(object_string, this_object, this_object_class, indent_stri
           else
             $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{association} (type: Association)")
             #
-            # See if we need to walk this association according to the @walk_association_policy variable, and the @walk_association_{whitelist,clacklist} hashes
+            # See if we need to walk this association according to the @walk_association_policy variable, and the @walk_association_{whitelist,blacklist} hashes
             #
             if @walk_association_policy == :whitelist
               if @walk_association_whitelist.has_key?(this_object_class) &&
@@ -310,7 +320,7 @@ def dump_associations(object_string, this_object, this_object_class, indent_stri
       end
       $evm.log("info", "#{indent_string}#{@method}:   --- end of associations ---")
     else
-      $evm.log("info", "#{indent_string}#{@method}:   This object has no associations")
+      $evm.log("info", "#{indent_string}#{@method}:   #{object_string} has no associations")
     end
   rescue => err
     $evm.log("error", "#{@method} (dump_associations) - [#{err}]\n#{err.backtrace.join("\n")}")
@@ -385,7 +395,7 @@ def dump_methods(object_string, this_object, indent_string)
         end
         $evm.log("info", "#{indent_string}#{@method}:   --- end of methods ---")
       else
-        $evm.log("info", "#{indent_string}#{@method}:   This object has no instance methods")
+        $evm.log("info", "#{indent_string}#{@method}:   #{object_string} has no instance methods")
       end
     end
   rescue => err
@@ -493,12 +503,16 @@ $evm.log("info", "     #{@method}:   $evm.current_object = #{$evm.current_object
 $evm.log("info", "     #{@method}:   $evm.current_object.current_field_name = #{$evm.current_object.current_field_name}   #{type($evm.current_object.current_field_name)}")
 $evm.log("info", "     #{@method}:   $evm.current_object.current_field_type = #{$evm.current_object.current_field_type}   #{type($evm.current_object.current_field_type)}")
 $evm.log("info", "     #{@method}:   $evm.current_method = #{$evm.current_method}   #{type($evm.current_method)}")
-$evm.log("info", "     #{@method}:   $evm.parent = #{$evm.parent}   #{type($evm.parent)}")
 $evm.log("info", "     #{@method}:   $evm.root = #{$evm.root}   #{type($evm.root)}")
 #
-# and then dump $evm.root
+# and now dump $evm.root...
 #
 dump_object("$evm.root", $evm.root, "")
+#
+# and finally our parent object...
+#
+$evm.log("info", "     #{@method}:   $evm.parent = #{$evm.parent}   #{type($evm.parent)}")
+dump_object("$evm.parent", $evm.parent, "")
 #
 # Exit method
 #
