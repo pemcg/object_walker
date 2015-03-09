@@ -54,6 +54,7 @@
 #               1.1     16-Feb-2015     Updated to change name change from objectWalker to object_walker
 #               1.1-1   19-Feb-2015     Changed the object_walker_start_re regex to allow for maj.min-up
 #               1.1-2   08-Feb-2015     Changed the regexes to search for 'objectWalker' or 'object_walker'
+#               1.1-3   09-Feb-2015     Changed all the regexes this time
 #  
 
 require 'optparse'
@@ -126,7 +127,7 @@ unless options[:list]
     if match
       puts match[2]
     end
-    if ( line =~ /object_walker - EVM Automate Method Ended/ )
+    if ( line =~ /[Oo]bject_*[Ww]alker - EVM Automate Method Ended/ )
       break
     end
   end
