@@ -55,9 +55,17 @@
 #               1.1-1   19-Feb-2015     Changed the object_walker_start_re regex to allow for maj.min-up
 #               1.1-2   08-Feb-2015     Changed the regexes to search for 'objectWalker' or 'object_walker'
 #               1.1-3   09-Feb-2015     Changed all the regexes this time
+#               1.1-4   22-Mar-2015     Fixed the case where a requested timestamp that didn't exist would still dump the last object_walker output
 #  
 
 require 'optparse'
+
+valid_timestamp_re = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}/
+object_walker_start_re = /----\] I, \[(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}) .*[Oo]bject_*[Ww]alker .* - EVM Automate Method Started/
+object_walker_body_re = /.*(AEMethod [Oo]bject_*[Ww]alker|Defined Method)\> (.*)/
+object_walker_end_re = /[Oo]bject_*[Ww]alker - EVM Automate Method Ended/
+found_timestamp = false
+dump_start = 0
 
 options = {:list => false, :filename => nil, :timestamp => nil}
 
@@ -79,16 +87,17 @@ parser = OptionParser.new do|opts|
 end
 parser.parse!
 
-if options[:timestamp] && options[:list]
-  puts "The options -t and -l shoud not be used together: use -l to list the dumps in the log file, and -t to select a particular dump timestamp"
-  exit!
+if options[:timestamp]
+  if options[:list]
+    puts "The options -t and -l shoud not be used together: use -l to list the dumps in the log file, and -t to select a particular dump timestamp"
+    exit!
+  end
+  unless valid_timestamp_re.match(options[:timestamp])
+    puts "Invalid timestamp format"
+    exit!
+  end
 end
-
-object_walker_start_re = /----\] I, \[(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}) .*[Oo]bject_*[Ww]alker .* - EVM Automate Method Started/
-object_walker_re = /.*(AEMethod [Oo]bject_*[Ww]alker|Defined Method)\> (.*)/
-
-dump_start = 0
-
+  
 if options[:filename].nil?
   filename = "/var/www/miq/vmdb/log/automation.log"
 else
@@ -111,6 +120,7 @@ file.each do |line|
     if options[:timestamp]
       if options[:timestamp] == match[1]
         dump_start = file.pos - line.length
+        found_timestamp = true
         break
       end
     end
@@ -120,14 +130,19 @@ file.each do |line|
     dump_start = file.pos - line.length
   end
 end
+if options[:timestamp] && !found_timestamp
+  puts "Timestamp: #{options[:timestamp]} not found in log file"
+  exit!
+end
+
 unless options[:list]
   file.seek(dump_start)
   file.each do |line|
-    match = object_walker_re.match(line)
+    match = object_walker_body_re.match(line)
     if match
       puts match[2]
     end
-    if ( line =~ /[Oo]bject_*[Ww]alker - EVM Automate Method Ended/ )
+    if object_walker_end_re.match(line)
       break
     end
   end
