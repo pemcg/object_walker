@@ -19,11 +19,13 @@
 #               1.4-3   02-Mar-2015     Detect duplicate entries in the associations list for each object
 #               1.4-4   08-Mar-2015     Walk $evm.parent after $evm.root
 #               1.4-5   29-Mar-2015     Only dump the associations, methods and virtual columns of an MiqAeMethodService::* class
-#               1.4-6   14-Apr-2015     Dump $evm.current.attributes if there are any
+#               1.4-6   14-Apr-2015     Dump $evm.current.attributes if there are any (arguments passed from a $evm.instantiate call)
+#                                       e.g. $evm.instantiate("Discovery/Methods/ObjectWalker?provider=#{provider}&lunch=sandwich")
+#               1.4-7   14-Apr-2015     Don't try to dump $evm.parent if it's a NilClass (e.g. if vmdb_object_type = automation_task)
 #
 require 'active_support/core_ext/string'
 @method = 'object_walker'
-VERSION = "1.4-6"
+VERSION = "1.4-7"
 #
 @recursion_level = 0
 @object_recorder = {}
@@ -537,10 +539,12 @@ end
 $evm.log("info", "     #{@method}:   $evm.root = #{$evm.root}   #{type($evm.root)}")
 dump_object("$evm.root", $evm.root, "")
 #
-# and finally our parent object...
+# and finally our parent object (if one exists)...
 #
 $evm.log("info", "     #{@method}:   $evm.parent = #{$evm.parent}   #{type($evm.parent)}")
-dump_object("$evm.parent", $evm.parent, "")
+unless $evm.parent.nil?
+  dump_object("$evm.parent", $evm.parent, "")
+end
 #
 # Exit method
 #
