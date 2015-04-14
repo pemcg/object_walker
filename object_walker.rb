@@ -18,10 +18,12 @@
 #               1.4-2   27-Feb-2015     Dump some $evm attributes first, and print the URI for an object type of DRb::DRbObject
 #               1.4-3   02-Mar-2015     Detect duplicate entries in the associations list for each object
 #               1.4-4   08-Mar-2015     Walk $evm.parent after $evm.root
+#               1.4-5   29-Mar-2015     Only dump the associations, methods and virtual columns of an MiqAeMethodService::* class
+#               1.4-6   14-Apr-2015     Dump $evm.current.attributes if there are any
 #
 require 'active_support/core_ext/string'
 @method = 'object_walker'
-VERSION = "1.4-4"
+VERSION = "1.4-6"
 #
 @recursion_level = 0
 @object_recorder = {}
@@ -35,7 +37,7 @@ MAX_RECURSION_LEVEL = 7
 # output dump. There are often many, and including them will usually increase verbosity, but it is
 # sometimes useful to know that a key/attribute exists, even if it currently has no assigned value.
 #
-@print_nil_values = false
+@print_nil_values = true
 #
 # @dump_methods defines whether or not we dump the methods of each object that we encounter. We only dump the methods
 # of the object and its superclasses up to but not including the methods of MiqAeMethodService::MiqAeServiceModelBase.
@@ -61,14 +63,15 @@ MAX_RECURSION_LEVEL = 7
 # $evm.root['vm'].datacenter (type: Association, objects found)
 #   (datacenter isn't in the @walk_associations hash for MiqAeServiceVmRedhat...)
 #
-# If you wish to explore and dump this associaiton, edit the hash to add the association name to the list associated with the object type. The symbol
+# If you wish to explore and dump this association, edit the hash to add the association name to the list associated with the object type. The symbol
 # :ALL can be used to walk all associations of an object type
 #
 @walk_association_whitelist = { "MiqAeServiceServiceTemplateProvisionTask" => ["source", "destination", "miq_request", "miq_request_tasks", "service_resource"],
+                                "MiqAeServiceServiceTemplateProvisionRequest" => ["miq_request", "miq_request_tasks", "requester", "resource", "source"],
                                 "MiqAeServiceServiceTemplate" => ["service_resources"],
                                 "MiqAeServiceServiceResource" => ["resource", "service_template"],
-                                "MiqAeServiceMiqProvisionRequest" => ["miq_request", "miq_request_tasks","eligible_clusters", "eligible_hosts", \
-                                                                      "eligible_storages", "miq_provisions", "requester", "resource", "source", "vm_template"],
+                                "MiqAeServiceMiqProvisionRequest" => ["miq_request", "miq_request_tasks", \
+                                                                      "miq_provisions", "requester", "resource", "source", "vm_template"],
                                 "MiqAeServiceMiqProvisionRequestTemplate" => ["miq_request", "miq_request_tasks"],
                                 "MiqAeServiceMiqProvisionVmware" => ["source", "destination", "miq_provision_request", "miq_request", "miq_request_task", "vm", \
                                                                      "vm_template"],
@@ -78,11 +81,14 @@ MAX_RECURSION_LEVEL = 7
                                                            "operating_system"],
                                 "MiqAeServiceVmRedhat" => ["ems_cluster", "ems_folder", "resource_pool", "ext_management_system", "storage", "service", "hardware"],
                                 "MiqAeServiceHardware" => ["nics", "guest_devices", "ports", "vm" ],
+                                "MiqAeServiceUser" => ["current_group"],
                                 "MiqAeServiceGuestDevice" => ["hardware", "lan", "network"]}
 #
 # if @walk_association_policy = :blacklist, then objectWalker will traverse all associations of all objects, except those
 # that are explicitly mentioned in the @walk_association_blacklist hash. This enables us to run a more exploratory dump, at the cost of a
-# much more verbose output. The symbol:ALL can be used to prevent the walking any associations of an object type
+# much more verbose output. The symbol:ALL can be used to prevent walking any associations of an object type
+#
+# You have been warned, using a blacklist walk_association_policy produces a lot of output!
 #
 @walk_association_blacklist = { "MiqAeServiceEmsCluster" => ["all_vms", "vms", "ems_events"],
                                 "MiqAeServiceEmsRedhat" => ["ems_events"],
@@ -127,8 +133,12 @@ def dump_attributes(object_string, this_object, indent_string)
       this_object.attributes.sort.each do |key, value|
         if key != "options"
           if value.is_a?(DRb::DRbObject)
-            $evm.log("info", "#{indent_string}#{@method}:   #{object_string}[\'#{key}\'] => #{value}   #{type(value)}")
-            dump_object("#{object_string}[\'#{key}\']", value, indent_string)
+            if value.method_missing(:class).to_s =~ /^MiqAeMethodService.*/
+              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}[\'#{key}\'] => #{value}   #{type(value)}")
+              dump_object("#{object_string}[\'#{key}\']", value, indent_string)
+            else
+              $evm.log("info", "#{indent_string}#{@method}:   Debug: not dumping, value.method_missing(:class) = #{value.method_missing(:class)}") if @debug
+            end
           else
             if value.nil?
               $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = nil") if @print_nil_values
@@ -171,25 +181,30 @@ end
 def dump_virtual_columns(object_string, this_object, this_object_class, indent_string)
   begin
     #
-    # Print the virtual columns of this object 
+    # Only dump the virtual columns of an MiqAeMethodService::* class
     #
-    if this_object.respond_to?(:virtual_column_names)
-      $evm.log("info", "#{indent_string}#{@method}:   --- virtual columns follow ---")
-      this_object.virtual_column_names.sort.each do |virtual_column_name|
-        begin
-          virtual_column_value = this_object.send(virtual_column_name)
-          if virtual_column_value.nil?
-            $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{virtual_column_name} = nil") if @print_nil_values
-          else
-            $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{virtual_column_name} = #{virtual_column_value}   #{type(virtual_column_value)}")
+    if this_object.method_missing(:class).to_s =~ /^MiqAeMethodService.*/
+      #
+      # Print the virtual columns of this object 
+      #
+      if this_object.respond_to?(:virtual_column_names)
+        $evm.log("info", "#{indent_string}#{@method}:   --- virtual columns follow ---")
+        this_object.virtual_column_names.sort.each do |virtual_column_name|
+          begin
+            virtual_column_value = this_object.send(virtual_column_name)
+            if virtual_column_value.nil?
+              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{virtual_column_name} = nil") if @print_nil_values
+            else
+              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{virtual_column_name} = #{virtual_column_value}   #{type(virtual_column_value)}")
+            end
+          rescue NoMethodError
+            $evm.log("info", "#{indent_string}#{@method}:   *** #{this_object_class} virtual column: \'#{virtual_column_name}\' gives a NoMethodError when accessed (product bug?) ***")
           end
-        rescue NoMethodError
-          $evm.log("info", "#{indent_string}#{@method}:   *** #{this_object_class} virtual column: \'#{virtual_column_name}\' gives a NoMethodError when accessed (product bug?) ***")
         end
+        $evm.log("info", "#{indent_string}#{@method}:   --- end of virtual columns ---")
+      else
+        $evm.log("info", "#{indent_string}#{@method}:   #{object_string} has no virtual columns")
       end
-      $evm.log("info", "#{indent_string}#{@method}:   --- end of virtual columns ---")
-    else
-      $evm.log("info", "#{indent_string}#{@method}:   #{object_string} has no virtual columns")
     end
   rescue => err
     $evm.log("error", "#{@method} (dump_virtual_columns) - [#{err}]\n#{err.backtrace.join("\n")}")
@@ -273,54 +288,59 @@ end
 def dump_associations(object_string, this_object, this_object_class, indent_string)
   begin
     #
-    # Print the associations of this object according to the @walk_associations_whitelist & @walk_associations_blacklist hashes
+    # Only dump the associations of an MiqAeMethodService::* class
     #
-    object_associations = []
-    associated_objects = []
-    duplicates = []
-    if this_object.respond_to?(:associations)
-      $evm.log("info", "#{indent_string}#{@method}:   --- associations follow ---")
-      object_associations = Array(this_object.associations)
-      duplicates = object_associations.select{|item| object_associations.count(item) > 1}
-      if duplicates.length > 0
-        $evm.log("info", "#{indent_string}#{@method}:   *** De-duplicating the following associations: #{duplicates.inspect} (product bug?) ***")
-      end
-      object_associations.uniq.sort.each do |association|
-        begin
-          associated_objects = Array(this_object.send(association))
-          if associated_objects.length == 0
-            $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{association} (type: Association (empty))")
-          else
-            $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{association} (type: Association)")
-            #
-            # See if we need to walk this association according to the @walk_association_policy variable, and the @walk_association_{whitelist,blacklist} hashes
-            #
-            if @walk_association_policy == :whitelist
-              if @walk_association_whitelist.has_key?(this_object_class) &&
-                  (@walk_association_whitelist[this_object_class].include?(:ALL) || @walk_association_whitelist[this_object_class].include?(association.to_s))
-                dump_association(object_string, association, associated_objects, indent_string)
-              else
-                $evm.log("info", "#{indent_string}#{@method}:   *** not walking: \'#{association}\' isn't in the @walk_association_whitelist hash for #{this_object_class} ***")
-              end
-            elsif @walk_association_policy == :blacklist
-              if @walk_association_blacklist.has_key?(this_object_class) &&
-                  (@walk_association_blacklist[this_object_class].include?(:ALL) || @walk_association_blacklist[this_object_class].include?(association.to_s))
-                $evm.log("info", "#{indent_string}#{@method}:   *** not walking: \'#{association}\' is in the @walk_association_blacklist hash for #{this_object_class} ***")
-              else
-                dump_association(object_string, association, associated_objects, indent_string)
-              end
-            else
-              $evm.log("info", "#{indent_string}#{@method}:   *** Invalid @walk_association_policy: #{@walk_association_policy} ***")
-              exit MIQ_ABORT
-            end
-          end
-        rescue NoMethodError
-          $evm.log("info", "#{indent_string}#{@method}:   *** #{this_object_class} association: \'#{association}\', gives a NoMethodError when accessed (product bug?) ***")
+    if this_object.method_missing(:class).to_s =~ /^MiqAeMethodService.*/
+      #
+      # Print the associations of this object according to the @walk_associations_whitelist & @walk_associations_blacklist hashes
+      #
+      object_associations = []
+      associated_objects = []
+      duplicates = []
+      if this_object.respond_to?(:associations)
+        $evm.log("info", "#{indent_string}#{@method}:   --- associations follow ---")
+        object_associations = Array(this_object.associations)
+        duplicates = object_associations.select{|item| object_associations.count(item) > 1}
+        if duplicates.length > 0
+          $evm.log("info", "#{indent_string}#{@method}:   *** De-duplicating the following associations: #{duplicates.inspect} (product bug?) ***")
         end
+        object_associations.uniq.sort.each do |association|
+          begin
+            associated_objects = Array(this_object.send(association))
+            if associated_objects.length == 0
+              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{association} (type: Association (empty))")
+            else
+              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{association} (type: Association)")
+              #
+              # See if we need to walk this association according to the @walk_association_policy variable, and the @walk_association_{whitelist,blacklist} hashes
+              #
+              if @walk_association_policy == :whitelist
+                if @walk_association_whitelist.has_key?(this_object_class) &&
+                    (@walk_association_whitelist[this_object_class].include?(:ALL) || @walk_association_whitelist[this_object_class].include?(association.to_s))
+                  dump_association(object_string, association, associated_objects, indent_string)
+                else
+                  $evm.log("info", "#{indent_string}#{@method}:   *** not walking: \'#{association}\' isn't in the @walk_association_whitelist hash for #{this_object_class} ***")
+                end
+              elsif @walk_association_policy == :blacklist
+                if @walk_association_blacklist.has_key?(this_object_class) &&
+                    (@walk_association_blacklist[this_object_class].include?(:ALL) || @walk_association_blacklist[this_object_class].include?(association.to_s))
+                  $evm.log("info", "#{indent_string}#{@method}:   *** not walking: \'#{association}\' is in the @walk_association_blacklist hash for #{this_object_class} ***")
+                else
+                  dump_association(object_string, association, associated_objects, indent_string)
+                end
+              else
+                $evm.log("info", "#{indent_string}#{@method}:   *** Invalid @walk_association_policy: #{@walk_association_policy} ***")
+                exit MIQ_ABORT
+              end
+            end
+          rescue NoMethodError
+            $evm.log("info", "#{indent_string}#{@method}:   *** #{this_object_class} association: \'#{association}\', gives a NoMethodError when accessed (product bug?) ***")
+          end
+        end
+        $evm.log("info", "#{indent_string}#{@method}:   --- end of associations ---")
+      else
+        $evm.log("info", "#{indent_string}#{@method}:   #{object_string} has no associations")
       end
-      $evm.log("info", "#{indent_string}#{@method}:   --- end of associations ---")
-    else
-      $evm.log("info", "#{indent_string}#{@method}:   #{object_string} has no associations")
     end
   rescue => err
     $evm.log("error", "#{@method} (dump_associations) - [#{err}]\n#{err.backtrace.join("\n")}")
@@ -342,7 +362,10 @@ end
 
 def dump_methods(object_string, this_object, indent_string)
   begin
-    unless object_string == "$evm.root"
+    #
+    # Only dump the methods of an MiqAeMethodService::* class
+    #
+    if this_object.method_missing(:class).to_s =~ /^MiqAeMethodService.*/
       $evm.log("info", "#{indent_string}#{@method}:   Class of remote DRb::DRbObject is: #{this_object.method_missing(:class)}") if @debug
       #
       # Get the instance methods of the class and convert to string
@@ -493,7 +516,7 @@ if @dump_methods
   end
 end
 #
-# Start with a few $evm attributes
+# Start with some $evm.current attributes
 #
 $evm.log("info", "     #{@method}:   $evm.current_namespace = #{$evm.current_namespace}   #{type($evm.current_namespace)}")
 $evm.log("info", "     #{@method}:   $evm.current_class = #{$evm.current_class}   #{type($evm.current_class)}")
@@ -503,10 +526,15 @@ $evm.log("info", "     #{@method}:   $evm.current_object = #{$evm.current_object
 $evm.log("info", "     #{@method}:   $evm.current_object.current_field_name = #{$evm.current_object.current_field_name}   #{type($evm.current_object.current_field_name)}")
 $evm.log("info", "     #{@method}:   $evm.current_object.current_field_type = #{$evm.current_object.current_field_type}   #{type($evm.current_object.current_field_type)}")
 $evm.log("info", "     #{@method}:   $evm.current_method = #{$evm.current_method}   #{type($evm.current_method)}")
-$evm.log("info", "     #{@method}:   $evm.root = #{$evm.root}   #{type($evm.root)}")
+if $evm.current.respond_to?(:attributes) 
+  $evm.current.attributes.sort.each do |key, value|
+    $evm.log("info", "     #{@method}:   $evm.current['#{key}'] = #{value}   #{type($evm.current[key])}")
+  end
+end
 #
 # and now dump $evm.root...
 #
+$evm.log("info", "     #{@method}:   $evm.root = #{$evm.root}   #{type($evm.root)}")
 dump_object("$evm.root", $evm.root, "")
 #
 # and finally our parent object...
