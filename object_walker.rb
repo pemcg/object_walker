@@ -22,10 +22,13 @@
 #               1.4-6   14-Apr-2015     Dump $evm.current.attributes if there are any (arguments passed from a $evm.instantiate call)
 #                                       e.g. $evm.instantiate("Discovery/Methods/ObjectWalker?provider=#{provider}&lunch=sandwich")
 #               1.4-7   14-Apr-2015     Don't try to dump $evm.parent if it's a NilClass (e.g. if vmdb_object_type = automation_task)
+#               1.5     15-Apr-2015     Correctly format attributes that are actually hash keys (object['attribute'] rather than
+#                                       object.attribute. This includes most of the attributes of $evm.root which had previously
+#                                       been displayed incorrectly)
 #
 require 'active_support/core_ext/string'
 @method = 'object_walker'
-VERSION = "1.4-7"
+VERSION = "1.5"
 #
 @recursion_level = 0
 @object_recorder = {}
@@ -116,6 +119,39 @@ end
 # End of type
 #-------------------------------------------------------------------------------------------------------------
 
+#-------------------------------------------------------------------------------------------------------------
+# Method:       ping_attr
+# Purpose:      Some attributes returned by object.attributes are actually hash keys rather than
+#               attributes. We need to know which is which so that we can format our pretty output
+#               correctly, so here we try to access the attribute as a method, and if that fails
+#               we try to access it as a hash key
+# Arguments:    this_object: object to be tested
+#               attribute: the attribute to be tested
+# Returns:      hash {:format_string => ".attribute" | "['attribute']", :value => value} 
+#-------------------------------------------------------------------------------------------------------------
+
+def ping_attr(this_object, attribute)
+  value = "<unreadable_value>"
+  format_string = ".<unknown_attribute>"
+  begin
+    #
+    # See if it's an attribute that we access using '.attrubute'
+    #
+    value = this_object.send(attribute)
+    format_string = ".#{attribute}"
+  rescue NoMethodError
+    #
+    # Seems not, let's try to access as if it's a hash value
+    #
+    value = this_object[attribute]
+    format_string = "['#{attribute}']"
+  end
+  return {:format_string => format_string, :value => value}
+end
+
+# End of ping_attr
+#-------------------------------------------------------------------------------------------------------------
+
 
 #-------------------------------------------------------------------------------------------------------------
 # Method:       dump_attributes
@@ -142,10 +178,19 @@ def dump_attributes(object_string, this_object, indent_string)
               $evm.log("info", "#{indent_string}#{@method}:   Debug: not dumping, value.method_missing(:class) = #{value.method_missing(:class)}") if @debug
             end
           else
-            if value.nil?
-              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = nil") if @print_nil_values
-            else
-              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = #{value}   #{type(value)}")
+            begin
+              attr_info = ping_attr(this_object, key)
+              if attr_info[:value].nil?
+                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}#{attr_info[:format_string]} = nil") if @print_nil_values
+              else
+                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}#{attr_info[:format_string]} = #{attr_info[:value]}   #{type(attr_info[:value])}")
+              end
+            rescue ArgumentError
+              if value.nil?
+                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = nil") if @print_nil_values
+              else
+                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = #{value}   #{type(value)}")
+              end
             end
           end
         else
@@ -160,7 +205,7 @@ def dump_attributes(object_string, this_object, indent_string)
       end
     else
       $evm.log("info", "#{indent_string}#{@method}:   #{object_string} has no attributes")
-    end
+    end 
   rescue => err
     $evm.log("error", "#{@method} (dump_attributes) - [#{err}]\n#{err.backtrace.join("\n")}")
   end
@@ -528,16 +573,16 @@ $evm.log("info", "     #{@method}:   $evm.current_object = #{$evm.current_object
 $evm.log("info", "     #{@method}:   $evm.current_object.current_field_name = #{$evm.current_object.current_field_name}   #{type($evm.current_object.current_field_name)}")
 $evm.log("info", "     #{@method}:   $evm.current_object.current_field_type = #{$evm.current_object.current_field_type}   #{type($evm.current_object.current_field_type)}")
 $evm.log("info", "     #{@method}:   $evm.current_method = #{$evm.current_method}   #{type($evm.current_method)}")
-if $evm.current.respond_to?(:attributes) 
-  $evm.current.attributes.sort.each do |key, value|
-    $evm.log("info", "     #{@method}:   $evm.current['#{key}'] = #{value}   #{type($evm.current[key])}")
-  end
-end
 #
 # and now dump $evm.root...
 #
 $evm.log("info", "     #{@method}:   $evm.root = #{$evm.root}   #{type($evm.root)}")
 dump_object("$evm.root", $evm.root, "")
+#
+# then dump $evm.current...
+#
+$evm.log("info", "     #{@method}:   $evm.current = #{$evm.root}   #{type($evm.current)}")
+dump_object("$evm.current", $evm.current, "")
 #
 # and finally our parent object (if one exists)...
 #
