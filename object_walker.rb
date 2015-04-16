@@ -23,12 +23,13 @@
 #                                       e.g. $evm.instantiate("Discovery/Methods/ObjectWalker?provider=#{provider}&lunch=sandwich")
 #               1.4-7   14-Apr-2015     Don't try to dump $evm.parent if it's a NilClass (e.g. if vmdb_object_type = automation_task)
 #               1.5     15-Apr-2015     Correctly format attributes that are actually hash keys (object['attribute'] rather than
-#                                       object.attribute. This includes most of the attributes of $evm.root which had previously
-#                                       been displayed incorrectly)
+#                                       object.attribute). This includes most of the attributes of $evm.root which had previously
+#                                       been displayed incorrectly
+#               1.5-1   16-Apr-2015     Fixed a bug where sometimes the return from calling object.attributes isn't iterable 
 #
 require 'active_support/core_ext/string'
 @method = 'object_walker'
-VERSION = "1.5"
+VERSION = "1.5-1"
 #
 @recursion_level = 0
 @object_recorder = {}
@@ -97,7 +98,9 @@ MAX_RECURSION_LEVEL = 7
 #
 @walk_association_blacklist = { "MiqAeServiceEmsCluster" => ["all_vms", "vms", "ems_events"],
                                 "MiqAeServiceEmsRedhat" => ["ems_events"],
-                                "MiqAeServiceHostRedhat" => ["guest_applications", "ems_events"]}
+                                "MiqAeServiceEmsVmware" => ["ems_events"],
+                                "MiqAeServiceHostRedhat" => ["guest_applications", "ems_events"],
+                                "MiqAeServiceHostVmwareEsx" => ["guest_applications", "ems_events"]}
 
 
 #-------------------------------------------------------------------------------------------------------------
@@ -135,7 +138,7 @@ def ping_attr(this_object, attribute)
   format_string = ".<unknown_attribute>"
   begin
     #
-    # See if it's an attribute that we access using '.attrubute'
+    # See if it's an attribute that we access using '.attribute'
     #
     value = this_object.send(attribute)
     format_string = ".#{attribute}"
@@ -168,40 +171,44 @@ def dump_attributes(object_string, this_object, indent_string)
     #
     if this_object.respond_to?(:attributes)
       $evm.log("info", "#{indent_string}#{@method}:   Debug: this_object.inspected = #{this_object.inspect}") if @debug
-      this_object.attributes.sort.each do |key, value|
-        if key != "options"
-          if value.is_a?(DRb::DRbObject)
-            if value.method_missing(:class).to_s =~ /^MiqAeMethodService.*/
-              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}[\'#{key}\'] => #{value}   #{type(value)}")
-              dump_object("#{object_string}[\'#{key}\']", value, indent_string)
+      if this_object.attributes.respond_to? :sort
+        this_object.attributes.sort.each do |key, value|
+          if key != "options"
+            if value.is_a?(DRb::DRbObject)
+              if value.method_missing(:class).to_s =~ /^MiqAeMethodService.*/
+                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}[\'#{key}\'] => #{value}   #{type(value)}")
+                dump_object("#{object_string}[\'#{key}\']", value, indent_string)
+              else
+                $evm.log("info", "#{indent_string}#{@method}:   Debug: not dumping, value.method_missing(:class) = #{value.method_missing(:class)}") if @debug
+              end
             else
-              $evm.log("info", "#{indent_string}#{@method}:   Debug: not dumping, value.method_missing(:class) = #{value.method_missing(:class)}") if @debug
+              begin
+                attr_info = ping_attr(this_object, key)
+                if attr_info[:value].nil?
+                  $evm.log("info", "#{indent_string}#{@method}:   #{object_string}#{attr_info[:format_string]} = nil") if @print_nil_values
+                else
+                  $evm.log("info", "#{indent_string}#{@method}:   #{object_string}#{attr_info[:format_string]} = #{attr_info[:value]}   #{type(attr_info[:value])}")
+                end
+              rescue ArgumentError
+                if value.nil?
+                  $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = nil") if @print_nil_values
+                else
+                  $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = #{value}   #{type(value)}")
+                end
+              end
             end
           else
-            begin
-              attr_info = ping_attr(this_object, key)
-              if attr_info[:value].nil?
-                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}#{attr_info[:format_string]} = nil") if @print_nil_values
+            value.sort.each do |k,v|
+              if v.nil?
+                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.options[:#{k}] = nil") if @print_nil_values
               else
-                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}#{attr_info[:format_string]} = #{attr_info[:value]}   #{type(attr_info[:value])}")
+                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.options[:#{k}] = #{v}   #{type(v)}")
               end
-            rescue ArgumentError
-              if value.nil?
-                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = nil") if @print_nil_values
-              else
-                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = #{value}   #{type(value)}")
-              end
-            end
-          end
-        else
-          value.sort.each do |k,v|
-            if v.nil?
-              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.options[:#{k}] = nil") if @print_nil_values
-            else
-              $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.options[:#{k}] = #{v}   #{type(v)}")
             end
           end
         end
+      else
+        $evm.log("info", "#{indent_string}#{@method}:   *** #{object_string} attributes are not iterable ***")
       end
     else
       $evm.log("info", "#{indent_string}#{@method}:   #{object_string} has no attributes")
@@ -426,8 +433,10 @@ def dump_methods(object_string, this_object, indent_string)
         #
         attributes = []
         if this_object.respond_to?(:attributes)
-          this_object.attributes.sort.each do |key, value|
-            attributes << key
+          if this_object.attributes.respond_to? :each
+            this_object.attributes.each do |key, value|
+              attributes << key
+            end
           end
         end
         attributes << "attributes"
