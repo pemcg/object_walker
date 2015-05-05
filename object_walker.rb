@@ -25,11 +25,13 @@
 #               1.5     15-Apr-2015     Correctly format attributes that are actually hash keys (object['attribute'] rather than
 #                                       object.attribute). This includes most of the attributes of $evm.root which had previously
 #                                       been displayed incorrectly
-#               1.5-1   16-Apr-2015     Fixed a bug where sometimes the return from calling object.attributes isn't iterable 
+#               1.5-1   16-Apr-2015     Fixed a bug where sometimes the return from calling object.attributes isn't iterable
+#               1.5-2   16-Apr-2015     Dump $evm.object rather than $evm.current - they are the same but more code examples use
+#                                       $evm.object so it's less ambiguous and possibly more useful to dump this
 #
 require 'active_support/core_ext/string'
 @method = 'object_walker'
-VERSION = "1.5-1"
+VERSION = "1.5-2"
 #
 @recursion_level = 0
 @object_recorder = {}
@@ -96,9 +98,9 @@ MAX_RECURSION_LEVEL = 7
 #
 # You have been warned, using a blacklist walk_association_policy produces a lot of output!
 #
-@walk_association_blacklist = { "MiqAeServiceEmsCluster" => ["all_vms", "vms", "ems_events"],
-                                "MiqAeServiceEmsRedhat" => ["ems_events"],
+@walk_association_blacklist = { "MiqAeServiceEmsRedhat" => ["ems_events"],
                                 "MiqAeServiceEmsVmware" => ["ems_events"],
+                                "MiqAeServiceEmsCluster" => ["all_vms", "vms", "ems_events"],
                                 "MiqAeServiceHostRedhat" => ["guest_applications", "ems_events"],
                                 "MiqAeServiceHostVmwareEsx" => ["guest_applications", "ems_events"]}
 
@@ -588,10 +590,10 @@ $evm.log("info", "     #{@method}:   $evm.current_method = #{$evm.current_method
 $evm.log("info", "     #{@method}:   $evm.root = #{$evm.root}   #{type($evm.root)}")
 dump_object("$evm.root", $evm.root, "")
 #
-# then dump $evm.current...
+# then dump $evm.object...
 #
-$evm.log("info", "     #{@method}:   $evm.current = #{$evm.root}   #{type($evm.current)}")
-dump_object("$evm.current", $evm.current, "")
+$evm.log("info", "     #{@method}:   $evm.object = #{$evm.object}   #{type($evm.object)}")
+dump_object("$evm.object", $evm.object, "")
 #
 # and finally our parent object (if one exists)...
 #
