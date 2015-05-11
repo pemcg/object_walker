@@ -163,7 +163,7 @@ begin
     opts.on('-t', '--timestamp timestamp', 'Date/time of the object_walker dump to be listed (hint: copy from -l output)') do |timestamp|
       options[:timestamp] = timestamp;
     end
-    opts.on('-d', '--diff timestamps', Array, 'Date/time of two object_walker dumps (comma separated) to be compared using \'diff\'') do |diff_timestamps|
+    opts.on('-d', '--diff timestamp1,timestamp2', Array, 'Date/time of two object_walker dumps to be compared using \'diff\'') do |diff_timestamps|
       unless diff_timestamps.length == 2
         puts "timestamps must be timestamp1,timestamp2 list"
         exit!
@@ -213,5 +213,5 @@ rescue => err
   puts "#{err}"
   exit!
 ensure
-  file.close
+  file.close unless file.nil?
 end
