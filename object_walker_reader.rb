@@ -3,11 +3,12 @@
 # object_walker_reader - extract the latest (no arguments), or a selected object_walker dump from automation.log or other renamed or
 # saved log file.
 #
-# Usage: object_walker_reader.rb [options]
-#     -l, --list                       list object_walker dumps in the file
-#     -f, --file filename              Full file path to automation.log
-#     -t, --timestamp timestamp        Date/time of the object_walker dump to be listed (hint: copy from -l output)
-#     -h, --help                       Displays Help
+#Usage: object_walker_reader.rb [options]
+#    -l, --list                       list object_walker dumps in the file
+#    -f, --file filename              Full file path to automation.log (if not /var/www/miq/vmdb/log/automtion.log)
+#    -t, --timestamp timestamp        Date/time of the object_walker dump to be listed (hint: copy from -l output)
+#    -d, --diff timestamp1,timestamp2 Date/time of two object_walker dumps to be compared using 'diff'
+#    -h, --help                       Displays Help
 #
 # Examples:
 #
