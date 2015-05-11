@@ -116,11 +116,39 @@ and the resulting output dump will leave out any keys or attributes that have ni
 
 ### Installation
 
-Under you own domain, create a new namespace, and a class to execute a single instance.
+Under your own domain, create a new namespace, and a class to execute a single instance.
 
 ![Screenshot 1](/images/screenshot1.tiff)
 
-Here I created an instance called ObjectWalker, and a method called object_walker containing the code
+Here I created an instance called ObjectWalker, and a method called object_walker containing the code.
+
+### Calling object_walker
+
+We get an object_walker dump by simply calling the new ObjectWalker instance from anywhere in the automation namespace, e.g.
+from a state in the VM Provision State Machine:
+
+![Screenshot 2](/images/screenshot2.tiff)
+
+...or from a button on a VM:
+
+![Screenshot 3](/images/screenshot3.tiff)
+
+### Customising the output
+
+The default @walk_association_whitelist dumps quite a lot of information, and it can be useful to tailor this for the particular
+type of dump that we are interested in. We can modify our ObjectWalker class to call one of several object_walker methods, each with
+a different @walk_association_whitelist, selected using a message when calling the instance.
+
+![Screenshot 4](/images/screenshot6.tiff)
+
+![Screenshot 5](/images/screenshot4.tiff)
+
+Now we can call the appropriate copy of object_walker with our customised @walk_association_whitelist, for example to compare the
+service provision data structure before and after calling CatalogItemInitialization:
+
+![Screenshot 5](/images/screenshot5.tiff)
+
+(we can use object_walker_reader --diff to compare the outputs - see below)
 
 ### object_walker_reader
 
@@ -135,7 +163,9 @@ Usage: object_walker_reader.rb [options]
     -d, --diff timestamp1,timestamp2 Date/time of two object_walker dumps to be compared using 'diff'
     -h, --help                       Displays Help                    Displays Help
 
- Examples:
+ #### Examples:
+ 
+ ##### listing dumps
 
  ./object_walker_reader.rb -l
  Found object_walker dump at 2014-09-17T13:28:42.052043
@@ -145,12 +175,16 @@ Usage: object_walker_reader.rb [options]
  Found object_walker dump at 2014-09-18T07:56:08.201025
  ...
  
+ ##### listing dumps in a non-default (i.e. copied from another system) log file
+ 
  ./object_walker_reader.rb -l -f /Documents/CloudForms/cf30-automation-log
  Found object_walker dump at 2014-09-18T09:52:28.797868
  Found object_walker dump at 2014-09-18T09:53:31.455892
  Found object_walker dump at 2014-09-18T10:05:39.040744
  Found object_walker dump at 2014-09-18T12:00:59.142460
  ...
+ 
+ ##### dumping a particular output by timestamp
  
  ./object_walker_reader.rb -t 2014-09-18T09:44:27.146812
  object_walker 1.0 - EVM Automate Method Started
@@ -169,5 +203,27 @@ Usage: object_walker_reader.rb [options]
       |    object_walker:   $evm.root['miq_server'].hostname = cf31b2-1.bit63.net   (type: String)
       |    object_walker:   $evm.root['miq_server'].id = 1000000000001   (type: Fixnum)
       |    object_walker:   $evm.root['miq_server'].ipaddress = 192.168.2.77   (type: String)
- ... 
+      
+ ##### Comparing the output from two dumps
+      
+ ./object_walker_reader.rb -d 2015-05-11T14:41:58.031661,2015-05-11T14:42:08.186930
+ Getting diff comparison from dumps at 2015-05-11T14:41:58.031661 and 2015-05-11T14:42:08.186930
+ 6c6
+ <      object_walker:   $evm.current_object = /Bit63/Discovery/ObjectWalker/default   (type: DRb::DRbObject, URI: druby://127.0.0.1:51860)
+ ---
+ >      object_walker:   $evm.current_object = /Bit63/Discovery/ObjectWalker/default   (type: DRb::DRbObject, URI: druby://127.0.0.1:54749)
+ 10c10
+ <      object_walker:   $evm.root = /Bit63/Service/Provisioning/StateMachines/ServiceProvision_Template/CatalogItemInitialization   (type: DRb::DRbObject, URI: druby://127.0.0.1:51860)
+ ---
+ >      object_walker:   $evm.root = /Bit63/Service/Provisioning/StateMachines/ServiceProvision_Template/CatalogItemInitialization   (type: DRb::DRbObject, URI: druby://127.0.0.1:54749)
+ 12c12
+ <      object_walker:   $evm.root['ae_state'] = pre1   (type: String)
+ ---
+ >      object_walker:   $evm.root['ae_state'] = pre3   (type: String)
+ 14c14
+ <      object_walker:   $evm.root['ae_state_started'] = 2015-05-11 14:41:56 UTC   (type: String)
+ ---
+ >      object_walker:   $evm.root['ae_state_started'] = 2015-05-11 14:42:07 UTC   (type: String) 
+  ... 
 ```
+To use, simple copy the object_walker_reader.rb file to the CloudForms appliance, and run.
