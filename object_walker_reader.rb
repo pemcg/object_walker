@@ -62,9 +62,9 @@ valid_timestamp_re = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}/
 
 #-------------------------------------------------------------------------------------------------------------
 # Method:       list_dumps
-# Purpose:      Returns a string containing the type of the object passed as an argument
-# Arguments:    object: object to be type tested
-# Returns:      string
+# Purpose:      List all object_walker dumps found in a given file
+# Arguments:    file: the opened automation file object
+# Returns:      nothing
 #-------------------------------------------------------------------------------------------------------------
 
 def list_dumps(file)
@@ -78,9 +78,11 @@ end
 
 #-------------------------------------------------------------------------------------------------------------
 # Method:       find_dump
-# Purpose:      Returns a string containing the type of the object passed as an argument
-# Arguments:    object: object to be type tested
-# Returns:      string
+# Purpose:      Writes an object_walker dump to stdout or a temporary file
+# Arguments:    file: the opened automation file object
+#               timestamp: an optional timestamp to dump the output from
+#               tempfile: an optional temp file to write the output to (used with --diff)
+# Returns:      nothing
 #-------------------------------------------------------------------------------------------------------------
 
 def find_dump(file, timestamp=nil, tempfile=nil)
@@ -128,9 +130,10 @@ end
 
 #-------------------------------------------------------------------------------------------------------------
 # Method:       diff_dumps
-# Purpose:      Returns a string containing the type of the object passed as an argument
-# Arguments:    object: object to be type tested
-# Returns:      string
+# Purpose:      Compares two object_walker dumps using diff
+# Arguments:    file: the opened automation file object
+#               timestamp1 & 2: the ojject_walker output timestamps to compare
+# Returns:      nothing
 #-------------------------------------------------------------------------------------------------------------
 
 def diff_dumps(file, timestamp1, timestamp2)
