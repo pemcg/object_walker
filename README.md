@@ -166,7 +166,7 @@ Usage: object_walker_reader.rb [options]
 
 #### Examples:
  
-##### listing dumps
+##### Listing object_walker dumps
 
 ```
  ./object_walker_reader.rb -l
@@ -178,7 +178,7 @@ Usage: object_walker_reader.rb [options]
  ...
  ```
  
-##### listing dumps in a non-default (i.e. copied from another system) log file
+##### Listing dumps in a non-default (i.e. copied from another system) log file
  
  ```
  ./object_walker_reader.rb -l -f /Documents/CloudForms/cf30-automation-log
@@ -189,7 +189,7 @@ Usage: object_walker_reader.rb [options]
  ...
  ```
  
-##### dumping a particular output by timestamp
+##### Dumping a particular object_walker output by timestamp
  
 ```
  ./object_walker_reader.rb -t 2014-09-18T09:44:27.146812
@@ -211,7 +211,7 @@ Usage: object_walker_reader.rb [options]
       |    object_walker:   $evm.root['miq_server'].ipaddress = 192.168.2.77   (type: String)
 ```
       
-##### Comparing the output from two dumps
+##### Comparing the output from two object_walker dumps
       
 ```
  ./object_walker_reader.rb -d 2015-05-11T14:41:58.031661,2015-05-11T14:42:08.186930
