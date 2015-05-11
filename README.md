@@ -1,5 +1,4 @@
-object_walker
-============
+## object_walker
 
 One of the challenges when starting out writing CloudForms or ManageIQ automation scripts, is knowing where the objects and attributes are under $evm.root that we may need to access. For example, depending on the automation action, we may have an $evm.root['vm'] object, or we may not.
  
@@ -10,30 +9,34 @@ as it goes, i.e.
 
 
 ```
-object_walker 1.0 - EVM Automate Method Started  
-      object_walker:   Dumping $evm.root  
-      object_walker:   $evm.root.ae_result = ok   (type: String)  
-      object_walker:   $evm.root.ae_state = RegisterDHCP   (type: String)  
-      object_walker:   $evm.root.ae_state_retries = 0   (type: Fixnum)  
-      object_walker:   $evm.root.ae_state_started = 2014-09-18 12:00:57 UTC   (type: String)  
-      object_walker:   $evm.root['miq_provision'] => #<MiqAeMethodService::MiqAeServiceMiqProvisionRedhatViaPxe:0x0000000f6b5d78>
-      |    object_walker:   $evm.root['miq_provision'].created_on = 2014-09-18 11:33:22 UTC   (type: ActiveSupport::TimeWithZone) 
-      |    object_walker:   $evm.root['miq_provision'].description = Provision from [Generic] to [cfme027]   (type: String)  
-      |    object_walker:   $evm.root['miq_provision'].destination_id = 1000000000058   (type: Fixnum)  
-      |    object_walker:   $evm.root['miq_provision'].destination_type = VmOrTemplate   (type: String)  
-      |    object_walker:   $evm.root['miq_provision'].id = 1000000000102   (type: Fixnum)  
-      |    object_walker:   $evm.root['miq_provision'].message = Registering DHCP   (type: String)
-      ...  
-      |    object_walker:   --- virtual columns follow ---  
-      |    object_walker:   $evm.root['miq_provision'].provision_type = template   (type: String)  
-      |    object_walker:   $evm.root['miq_provision'].region_description = Region 1   (type: String)  
-      ...  
-      |    object_walker:   --- end of virtual columns ---  
-      |    object_walker:   $evm.root['miq_provision'].destination (type: Association, objects found)  
-      |    object_walker:   destination = $evm.root['miq_provision'].destination  
-      |    |    object_walker:   (object type: MiqAeServiceVmRedhat, object ID: 1000000000058)  
-      |    |    object_walker:   destination.connection_state = connected   (type: String)  
-      |    |    object_walker:   destination.created_on = 2014-09-18 11:35:17 UTC   (type: ActiveSupport::TimeWithZone)  
+object_walker 1.5-2 - EVM Automate Method Started
+     object_walker:   $evm.current_namespace = Bit63/Discovery   (type: String)
+     object_walker:   $evm.current_class = ObjectWalker   (type: String)
+     object_walker:   $evm.current_instance = default   (type: String)
+     object_walker:   $evm.current_message = provisioning   (type: String)
+     object_walker:   $evm.current_object = /Bit63/Discovery/ObjectWalker/default   (type: DRb::DRbObject, URI: druby://127.0.0.1:48366)
+     object_walker:   $evm.current_object.current_field_name = provisioning   (type: String)
+     object_walker:   $evm.current_object.current_field_type = method   (type: String)
+     object_walker:   $evm.current_method = object_walk_provisioning   (type: String)
+     object_walker:   $evm.root = /ManageIQ/System/Process/AUTOMATION   (type: DRb::DRbObject, URI: druby://127.0.0.1:48366)
+     object_walker:   $evm.root['ae_provider_category'] = infrastructure   (type: String)
+     object_walker:   $evm.root['ae_result'] = ok   (type: String)
+     object_walker:   $evm.root['ae_state'] = ObjectWalker   (type: String)
+     object_walker:   $evm.root['ae_state_retries'] = 0   (type: Fixnum)
+     object_walker:   $evm.root['ae_state_started'] = 2015-05-11 14:51:50 UTC   (type: String)
+     object_walker:   $evm.root['ae_status_state'] = on_entry   (type: String)
+     object_walker:   $evm.root['miq_provision'] => #<MiqAeMethodService::MiqAeServiceMiqProvisionRedhat:0x00000009d76a78>   (type: DRb::DRbObject, URI: druby://127.0.0.1:48366)
+     |    object_walker:   $evm.root['miq_provision'].created_on = 2015-05-11 14:41:49 UTC   (type: ActiveSupport::TimeWithZone)
+     |    object_walker:   $evm.root['miq_provision'].description = Provision from [rhel7-generic] to [changeme]   (type: String)
+     |    object_walker:   $evm.root['miq_provision'].destination_id = 1000000000090   (type: Fixnum)
+     |    object_walker:   $evm.root['miq_provision'].destination_type = Vm   (type: String)
+     ...
+     |    object_walker:   $evm.root['miq_provision'].destination (type: Association)
+     |    object_walker:   destination = $evm.root['miq_provision'].destination
+     |    |    object_walker:   (object type: MiqAeServiceVmRedhat, object ID: 1000000000090)
+     |    |    object_walker:   destination.autostart = nil
+     |    |    object_walker:   destination.availability_zone_id = nil
+     |    |    object_walker:   destination.blackbox_exists = nil
 ```
   etc
       
@@ -111,15 +114,26 @@ variable:
  
 and the resulting output dump will leave out any keys or attributes that have nil values.
 
+### Installation
+
+Under you own domain, create a new namespace, and a class to execute a single instance.
+
+![Screenshot 1](/images/screenshot1.tiff)
+
+Here I created an instance called ObjectWalker, and a method called object_walker containing the code
+
+### object_walker_reader
+
 Use object_walker_reader to extract the latest (no arguments), or a selected object_walker dump from automation.log or other 
 renamed or saved log file.
 
 ```
 Usage: object_walker_reader.rb [options]
-     -l, --list                       list object_walker dumps in the file
-     -f, --file filename              Full file path to automation.log
-     -t, --timestamp timestamp        Date/time of the object_walker dump to be listed (hint: copy from -l output)
-     -h, --help                       Displays Help
+    -l, --list                       list object_walker dumps in the file
+    -f, --file filename              Full file path to automation.log (if not /var/www/miq/vmdb/log/automtion.log)
+    -t, --timestamp timestamp        Date/time of the object_walker dump to be listed (hint: copy from -l output)
+    -d, --diff timestamp1,timestamp2 Date/time of two object_walker dumps to be compared using 'diff'
+    -h, --help                       Displays Help                    Displays Help
 
  Examples:
 
