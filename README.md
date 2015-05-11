@@ -48,8 +48,10 @@ if @walk_association_policy = :whitelist, then object_walker will only traverse 
 mentioned in the @walk_association_whitelist hash. This enables us to carefully control what is dumped. If object_walker finds
 an association that isn't in the hash, it will print a line similar to:
 
+```
 $evm.root['vm'].datacenter (type: Association, objects found)
    (datacenter isn't in the @walk_associations hash for MiqAeServiceVmRedhat...)
+```
 
 If you wish to explore and dump this associaiton, edit the hash to add the association name to the list associated with the 
 object type. The symbol :ALL can be used to walk all associations of an object type
@@ -129,9 +131,15 @@ from a state in the VM Provision State Machine:
 
 ![Screenshot 2](/images/screenshot2.tiff)
 
-...or from a button on a VM:
+... or from a button on a VM:
 
 ![Screenshot 3](/images/screenshot3.tiff)
+
+... or even in-line from some other automation code:
+
+```
+$evm.instantiate('/Discovery/Methods/ObjectWalker')
+```
 
 ### Customising the output
 
