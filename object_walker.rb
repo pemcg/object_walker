@@ -28,16 +28,18 @@
 #               1.5-1   16-Apr-2015     Fixed a bug where sometimes the return from calling object.attributes isn't iterable
 #               1.5-2   16-Apr-2015     Dump $evm.object rather than $evm.current - they are the same but more code examples use
 #                                       $evm.object so it's less ambiguous and possibly more useful to dump this
+#               1.5-3   12-Jul-2015     Refactored dump_attributes slightly to allow for the fact that options hash keys can be strings
+#                                       or symbols (a mix of the two causes sort to error)
 #
 require 'active_support/core_ext/string'
 @method = 'object_walker'
-VERSION = "1.5-2"
+VERSION = "1.5-3"
 #
 @recursion_level = 0
 @object_recorder = {}
 @debug = false
 #
-# Change MAX_RECURSION_LEVEL to adjust the depth of recursion that objectWalker traverses through the objects
+# Change MAX_RECURSION_LEVEL to adjust the depth of recursion that object_walker traverses through the objects
 #
 MAX_RECURSION_LEVEL = 7
 #
@@ -64,8 +66,8 @@ MAX_RECURSION_LEVEL = 7
 #
 @walk_association_policy = :whitelist
 #
-# if @walk_association_policy = :whitelist, then objectWalker will only traverse associations of objects that are explicitly
-# mentioned in the @walk_association_whitelist hash. This enables us to carefully control what is dumped. If objectWalker finds
+# if @walk_association_policy = :whitelist, then object_walker will only traverse associations of objects that are explicitly
+# mentioned in the @walk_association_whitelist hash. This enables us to carefully control what is dumped. If object_walker finds
 # an association that isn't in the hash, it will print a line similar to:
 #
 # $evm.root['vm'].datacenter (type: Association, objects found)
@@ -92,7 +94,7 @@ MAX_RECURSION_LEVEL = 7
                                 "MiqAeServiceUser" => ["current_group"],
                                 "MiqAeServiceGuestDevice" => ["hardware", "lan", "network"]}
 #
-# if @walk_association_policy = :blacklist, then objectWalker will traverse all associations of all objects, except those
+# if @walk_association_policy = :blacklist, then object_walker will traverse all associations of all objects, except those
 # that are explicitly mentioned in the @walk_association_blacklist hash. This enables us to run a more exploratory dump, at the cost of a
 # much more verbose output. The symbol:ALL can be used to prevent walking any associations of an object type
 #
@@ -157,6 +159,27 @@ end
 # End of ping_attr
 #-------------------------------------------------------------------------------------------------------------
 
+#-------------------------------------------------------------------------------------------------------------
+# Method:       str_or_sym
+# Purpose:      format a string containing the argument correctly depending on whether the value
+#               is a symbol or string
+# Arguments:    value: the thing to be string-formatted
+# Returns:      string containing either ":value" or "'value'"
+#-------------------------------------------------------------------------------------------------------------
+
+def str_or_sym(value)
+  value_as_string = ""
+  if value.is_a?(Symbol)
+    value_as_string = ":#{value}"
+  else
+    value_as_string = "\'#{value}\'"
+  end
+  return value_as_string
+end
+
+# End of str_or_sym
+#-------------------------------------------------------------------------------------------------------------
+
 
 #-------------------------------------------------------------------------------------------------------------
 # Method:       dump_attributes
@@ -173,38 +196,48 @@ def dump_attributes(object_string, this_object, indent_string)
     #
     if this_object.respond_to?(:attributes)
       $evm.log("info", "#{indent_string}#{@method}:   Debug: this_object.inspected = #{this_object.inspect}") if @debug
-      if this_object.attributes.respond_to? :sort
-        this_object.attributes.sort.each do |key, value|
-          if key != "options"
-            if value.is_a?(DRb::DRbObject)
-              if value.method_missing(:class).to_s =~ /^MiqAeMethodService.*/
-                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}[\'#{key}\'] => #{value}   #{type(value)}")
-                dump_object("#{object_string}[\'#{key}\']", value, indent_string)
+      if this_object.attributes.respond_to?(:keys)
+        this_object.attributes.keys.sort.each do |attribute_name|
+          attribute_value = this_object.attributes[attribute_name]
+          if attribute_name != "options"
+            if attribute_value.is_a?(DRb::DRbObject)
+              if attribute_value.method_missing(:class).to_s =~ /^MiqAeMethodService.*/
+                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}[\'#{attribute_name}\'] => #{attribute_value}   #{type(attribute_value)}")
+                dump_object("#{object_string}[\'#{attribute_name}\']", attribute_value, indent_string)
               else
-                $evm.log("info", "#{indent_string}#{@method}:   Debug: not dumping, value.method_missing(:class) = #{value.method_missing(:class)}") if @debug
+                $evm.log("info", "#{indent_string}#{@method}:   Debug: not dumping, attribute_value.method_missing(:class) = #{attribute_value.method_missing(:class)}") if @debug
               end
             else
               begin
-                attr_info = ping_attr(this_object, key)
+                attr_info = ping_attr(this_object, attribute_name)
                 if attr_info[:value].nil?
                   $evm.log("info", "#{indent_string}#{@method}:   #{object_string}#{attr_info[:format_string]} = nil") if @print_nil_values
                 else
                   $evm.log("info", "#{indent_string}#{@method}:   #{object_string}#{attr_info[:format_string]} = #{attr_info[:value]}   #{type(attr_info[:value])}")
                 end
               rescue ArgumentError
-                if value.nil?
-                  $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = nil") if @print_nil_values
+                if attribute_value.nil?
+                  $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{attribute_name} = nil") if @print_nil_values
                 else
-                  $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{key} = #{value}   #{type(value)}")
+                  $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.#{attribute_name} = #{attribute_value}   #{type(attribute_value)}")
                 end
               end
             end
           else
-            value.sort.each do |k,v|
-              if v.nil?
-                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.options[:#{k}] = nil") if @print_nil_values
+            #
+            # Option key names can be mixed symbols and strings which confuses .sort
+            # Create an option_map hash that maps option_name.to_s => option_name
+            #
+            option_map = {}
+            options = attribute_value.keys
+            options.each do |option_name|
+              option_map[option_name.to_s] = option_name
+            end
+            option_map.keys.sort.each do |option|
+              if attribute_value[option_map[option]].nil?
+                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.options[#{str_or_sym(option_map[option])}] = nil") if @print_nil_values
               else
-                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.options[:#{k}] = #{v}   #{type(v)}")
+                $evm.log("info", "#{indent_string}#{@method}:   #{object_string}.options[#{str_or_sym(option_map[option])}] = #{attribute_value[option_map[option]]}   #{type(attribute_value[option_map[option]])}")
               end
             end
           end
