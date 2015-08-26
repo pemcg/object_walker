@@ -120,7 +120,7 @@ and the resulting output dump will leave out any keys or attributes that have ni
 
 Under your own domain, create a new namespace, and a class to execute a single instance.
 
-![Screenshot 1](/images/screenshot1.tiff)
+![Screenshot 1](images/screenshot1.tiff)
 
 Here I created an instance called ObjectWalker, and a method called object_walker containing the code.
 
@@ -129,11 +129,11 @@ Here I created an instance called ObjectWalker, and a method called object_walke
 We get an object_walker dump by simply calling the new ObjectWalker instance from anywhere in the automation namespace, e.g.
 from a state in the VM Provision State Machine:
 
-![Screenshot 2](/images/screenshot2.tiff)
+![Screenshot 2](images/screenshot2.tiff)
 
 ... or from a button on a VM:
 
-![Screenshot 3](/images/screenshot3.tiff)
+![Screenshot 3](images/screenshot3.tiff)
 
 ... or even in-line from some other automation code:
 
@@ -147,14 +147,14 @@ The default @walk_association_whitelist dumps quite a lot of information, and it
 type of dump that we are interested in. We can modify our ObjectWalker class to call one of several object_walker methods, each with
 a different @walk_association_whitelist, selected using a message when calling the instance. See sample_whitelists.rb for some examples.
 
-![Screenshot 4](/images/screenshot6.tiff)
+![Screenshot 4](images/screenshot6.tiff)
 
-![Screenshot 5](/images/screenshot4.tiff)
+![Screenshot 5](images/screenshot4.tiff)
 
 Now we can call the appropriate copy of object_walker with our customised @walk_association_whitelist, for example to compare the
 service provision data structures before and after calling CatalogItemInitialization:
 
-![Screenshot 5](/images/screenshot5.tiff)
+![Screenshot 5](images/screenshot5.tiff)
 
 (we can use object_walker_reader --diff to compare the outputs - see below)
 
