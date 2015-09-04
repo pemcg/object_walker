@@ -1,10 +1,10 @@
 ## object_walker
 
 One of the challenges when starting out writing CloudForms or ManageIQ automation scripts, is knowing where the objects and attributes are under $evm.root that we may need to access. For example, depending on the automation action, we may have an $evm.root['vm'] object, or we may not.
- 
-This script is an attempt to demystify the object structure that is available at any point in the Automation engine. 
 
-Calling the script from any point will walk the object hierarchy from $evm.root downwards, printing objects and attributes 
+This script is an attempt to demystify the object structure that is available at any point in the Automation engine.
+
+Calling the script from any point will walk the object hierarchy from $evm.root downwards, printing objects and attributes
 as it goes, i.e.
 
 
@@ -39,10 +39,10 @@ object_walker 1.5-2 - EVM Automate Method Started
      |    |    object_walker:   destination.blackbox_exists = nil
 ```
   etc
-      
-Many of the objects that we can walk through are in fact Rails Active Record Associations (object representations of database 
-records), and we often don't want to print all of them. The script has a variable @walk_association_policy, that should have 
-the value of either :whitelist or :blacklist. 
+
+Many of the objects that we can walk through are in fact Rails Active Record Associations (object representations of database
+records), and we often don't want to print all of them. The script has a variable @walk_association_policy, that should have
+the value of either :whitelist or :blacklist.
 
 if @walk_association_policy = :whitelist, then object_walker will only traverse associations of objects that are explicitly
 mentioned in the @walk_association_whitelist hash. This enables us to carefully control what is dumped. If object_walker finds
@@ -53,7 +53,7 @@ $evm.root['vm'].datacenter (type: Association, objects found)
    (datacenter isn't in the @walk_associations hash for MiqAeServiceVmRedhat...)
 ```
 
-If you wish to explore and dump this associaiton, edit the hash to add the association name to the list associated with the 
+If you wish to explore and dump this associaiton, edit the hash to add the association name to the list associated with the
 object type. The symbol :ALL can be used to walk all associations of an object type
 
 ```ruby
@@ -69,8 +69,8 @@ object type. The symbol :ALL can be used to walk all associations of an object t
                                 "MiqAeServiceHardware" => ["nics"]}
 ```
 
-if @walk_association_policy = :blacklist, then object_walker will traverse all associations of all objects, _except_ those that 
-are explicitly mentioned in the @walk_association_blacklist hash. This enables us to run a more exploratory dump, at the 
+if @walk_association_policy = :blacklist, then object_walker will traverse all associations of all objects, _except_ those that
+are explicitly mentioned in the @walk_association_blacklist hash. This enables us to run a more exploratory dump, at the
 cost of a much more verbose output. The symbol:ALL can be used to prevent the walking any associations of an object type
 
 ```ruby
@@ -80,47 +80,47 @@ cost of a much more verbose output. The symbol:ALL can be used to prevent the wa
 ```
 
 
-Several of the objects in the Automate model have circular references to themselves either directly or indirectly through 
+Several of the objects in the Automate model have circular references to themselves either directly or indirectly through
 other associations. To prevent the same object being dumped multiple times the script records where it's been, and prints:
- 
+
 ```
 object_walker:   Object MiqAeServiceServiceTemplate with ID 1000000000003 has already been dumped...
 ```
 
 Many attributes that get dumped have a value of 'nil', i.e.
- 
-```      
-object_walker:   $evm.root['user'] => #<MiqAeMethodService::MiqAeServiceUser:0x000000056e9bf0>   (type: DRb::DRbObject)  
-      |    object_walker:   $evm.root['user'].created_on = 2014-09-16 07:52:05 UTC   (type: ActiveSupport::TimeWithZone)  
-      |    object_walker:   $evm.root['user'].current_group_id = 1000000000001   (type: Fixnum)  
-      |    object_walker:   $evm.root['user'].email = nil  
-...  
-      |    object_walker:   --- virtual columns follow ---  
-      |    object_walker:   $evm.root['user'].allocated_memory = 0   (type: Fixnum)  
-      |    object_walker:   $evm.root['user'].allocated_storage = 0   (type: Fixnum)  
-      |    object_walker:   $evm.root['user'].allocated_vcpu = 0   (type: Fixnum)  
-      |    object_walker:   $evm.root['user'].custom_1 = nil  
-      |    object_walker:   $evm.root['user'].custom_2 = nil  
-      |    object_walker:   $evm.root['user'].custom_3 = nil  
-      |    object_walker:   $evm.root['user'].custom_4 = nil  
-      |    object_walker:   $evm.root['user'].custom_5 = nil  
+
 ```
-      
+object_walker:   $evm.root['user'] => #<MiqAeMethodService::MiqAeServiceUser:0x000000056e9bf0>   (type: DRb::DRbObject)
+      |    object_walker:   $evm.root['user'].created_on = 2014-09-16 07:52:05 UTC   (type: ActiveSupport::TimeWithZone)
+      |    object_walker:   $evm.root['user'].current_group_id = 1000000000001   (type: Fixnum)
+      |    object_walker:   $evm.root['user'].email = nil
+...
+      |    object_walker:   --- virtual columns follow ---
+      |    object_walker:   $evm.root['user'].allocated_memory = 0   (type: Fixnum)
+      |    object_walker:   $evm.root['user'].allocated_storage = 0   (type: Fixnum)
+      |    object_walker:   $evm.root['user'].allocated_vcpu = 0   (type: Fixnum)
+      |    object_walker:   $evm.root['user'].custom_1 = nil
+      |    object_walker:   $evm.root['user'].custom_2 = nil
+      |    object_walker:   $evm.root['user'].custom_3 = nil
+      |    object_walker:   $evm.root['user'].custom_4 = nil
+      |    object_walker:   $evm.root['user'].custom_5 = nil
+```
+
 Sometimes we want to know that the attribute is present, even if its value is nil, but at other times we only wish to know
-about attributes with valid values (this also gives us a more concise dump output). In this case we can define the script 
+about attributes with valid values (this also gives us a more concise dump output). In this case we can define the script
 variable:
- 
+
 ```ruby
 @print_nil_values = false
 ```
- 
+
 and the resulting output dump will leave out any keys or attributes that have nil values.
 
 ### Installation
 
 Under your own domain, create a new namespace, and a class to execute a single instance.
 
-![Screenshot 1](images/screenshot1.tiff)
+![Screenshot 01](images/screenshot01.jpg)
 
 Here I created an instance called ObjectWalker, and a method called object_walker containing the code.
 
@@ -129,11 +129,11 @@ Here I created an instance called ObjectWalker, and a method called object_walke
 We get an object_walker dump by simply calling the new ObjectWalker instance from anywhere in the automation namespace, e.g.
 from a state in the VM Provision State Machine:
 
-![Screenshot 2](images/screenshot2.tiff)
+![Screenshot 02](images/screenshot02.jpg)
 
 ... or from a button on a VM:
 
-![Screenshot 3](images/screenshot3.tiff)
+![Screenshot 03](images/screenshot03.jpg)
 
 ... or even in-line from some other automation code:
 
@@ -147,20 +147,20 @@ The default @walk_association_whitelist dumps quite a lot of information, and it
 type of dump that we are interested in. We can modify our ObjectWalker class to call one of several object_walker methods, each with
 a different @walk_association_whitelist, selected using a message when calling the instance. See sample_whitelists.rb for some examples.
 
-![Screenshot 4](images/screenshot6.tiff)
+![Screenshot 04](images/screenshot04.jpg)
 
-![Screenshot 5](images/screenshot4.tiff)
+![Screenshot 05](images/screenshot05.jpg)
 
 Now we can call the appropriate copy of object_walker with our customised @walk_association_whitelist, for example to compare the
 service provision data structures before and after calling CatalogItemInitialization:
 
-![Screenshot 5](images/screenshot5.tiff)
+![Screenshot 06](images/screenshot06.jpg)
 
 (we can use object_walker_reader --diff to compare the outputs - see below)
 
 ### object_walker_reader
 
-Use object_walker_reader to extract the latest (no arguments), or a selected object_walker dump from automation.log or other 
+Use object_walker_reader to extract the latest (no arguments), or a selected object_walker dump from automation.log or other
 renamed or saved log file.
 
 ```
@@ -173,7 +173,7 @@ Usage: object_walker_reader.rb [options]
 ```
 
 #### Examples:
- 
+
 ##### Listing object_walker dumps
 
 ```
@@ -185,9 +185,9 @@ Usage: object_walker_reader.rb [options]
  Found object_walker dump at 2014-09-18T07:56:08.201025
  ...
  ```
- 
+
 ##### Listing dumps in a non-default (i.e. copied from another system) log file
- 
+
  ```
  ./object_walker_reader.rb -l -f /Documents/CloudForms/cf30-automation-log
  Found object_walker dump at 2014-09-18T09:52:28.797868
@@ -196,9 +196,9 @@ Usage: object_walker_reader.rb [options]
  Found object_walker dump at 2014-09-18T12:00:59.142460
  ...
  ```
- 
+
 ##### Dumping a particular object_walker output by timestamp
- 
+
 ```
  ./object_walker_reader.rb -t 2014-09-18T09:44:27.146812
  object_walker 1.0 - EVM Automate Method Started
@@ -218,9 +218,9 @@ Usage: object_walker_reader.rb [options]
       |    object_walker:   $evm.root['miq_server'].id = 1000000000001   (type: Fixnum)
       |    object_walker:   $evm.root['miq_server'].ipaddress = 192.168.2.77   (type: String)
 ```
-      
+
 ##### Comparing the output from two object_walker dumps
-      
+
 ```
  ./object_walker_reader.rb -d 2015-05-11T14:41:58.031661,2015-05-11T14:42:08.186930
  Getting diff comparison from dumps at 2015-05-11T14:41:58.031661 and 2015-05-11T14:42:08.186930
@@ -239,7 +239,7 @@ Usage: object_walker_reader.rb [options]
  14c14
  <      object_walker:   $evm.root['ae_state_started'] = 2015-05-11 14:41:56 UTC   (type: String)
  ---
- >      object_walker:   $evm.root['ae_state_started'] = 2015-05-11 14:42:07 UTC   (type: String) 
-  ... 
+ >      object_walker:   $evm.root['ae_state_started'] = 2015-05-11 14:42:07 UTC   (type: String)
+  ...
 ```
 To use, simple copy the object_walker_reader.rb file to the CloudForms appliance (for example to /root), and run.
