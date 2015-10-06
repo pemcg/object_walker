@@ -50,15 +50,34 @@
 #               1.1-4   22-Mar-2015     Fixed the case where a requested timestamp that didn't exist would still dump the last object_walker output
 #               1.1-5   09-May-2015     Read automation.log in UTF-8 format
 #               1.2     11-May-2015     Re-factored, and added --diff switch
+#               1.3     06-Oct-2015     Changed regexes to match pre or post 1.6 format object_walker dumps. No longer print 'object_walker'
+#                                       for each line. Strip the ID from 1.6 format object_walker dumps.
 #  
 
 require 'optparse'
 require 'tempfile'
+@debug = false
 
 valid_timestamp_re = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}/
-@object_walker_start_re = /----\] I, \[(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}) .*[Oo]bject_*[Ww]alker .* - EVM Automate Method Started/
-@object_walker_body_re = /.*AEMethod [Oo]bject_*[Ww]alk.*?\> (.*)/
-@object_walker_end_re = /[Oo]bject_*[Ww]alker - EVM Automate Method Ended/
+#
+# Match pre and post 1.6 format object_walker dumps
+#
+@object_walker_start_re = %r{
+                            ----\]\ I,\ \[(?<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6})
+                            \ .*[Oo]bject_*[Ww]alker\ .*\ -\ EVM\ Automate\ Method\ Started
+                            |
+                            ----\]\ I,\ \[(?<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6})
+                            \ .*[Oo]bject_*[Ww]alk.*?(?<id>\#\w+):\ \ \ Object\ Walker\ (?<version>.+)\ Starting
+                          }x
+@object_walker_body_re = %r{
+                          .*AEMethod\ [Oo]bject_*[Ww]alk.*>\ (?<indent>[\s|]*)
+                          [Oo]bject_*[Ww]alk.*?(?<id>\#\w+)*:*(\ \ \ |\ -\ )(?<output>.*)
+                          }x
+@object_walker_end_re = %r{
+                          [Oo]bject_*[Ww]alker\ -\ EVM\ Automate\ Method\ Ended
+                          |
+                          [Oo]bject_*[Ww]alk.*?(?<id>\#\w+):\ \ \ Object\ Walker\ Complete
+                          }x
 
 #-------------------------------------------------------------------------------------------------------------
 # Method:       list_dumps
@@ -71,7 +90,7 @@ def list_dumps(file)
   file.each do |line|
     match = @object_walker_start_re.match(line)
     if match
-      puts "Found object_walker dump at #{match[1]}"
+      puts "Found object_walker dump at #{match[:timestamp]}"
     end
   end
 end
@@ -88,11 +107,16 @@ end
 def find_dump(file, timestamp=nil, tempfile=nil)
   found_timestamp = false
   dump_start = 0
+  id = nil
+  version = nil
+  file.seek(0)
   file.each do |line|
     match = @object_walker_start_re.match(line)
     if match
+      id = match[:id]
+      version = match[:version]
       unless timestamp.nil?
-        if timestamp == match[1]
+        if timestamp == match[:timestamp]
           dump_start = file.pos - line.length
           found_timestamp = true
           break
@@ -116,14 +140,37 @@ def find_dump(file, timestamp=nil, tempfile=nil)
   file.each do |line|
     match = @object_walker_body_re.match(line)
     if match
-      if tempfile.nil?
-        puts match[1]
+      if id.nil?
+        #
+        # pre 1.6 format output
+        #
+        if tempfile.nil?
+          puts "#{match[:indent]}#{match[:output]}"
+        else
+          tempfile.write("#{match[:indent]}#{match[:output]}\n")
+        end
       else
-        tempfile.write("#{match[1]}\n")
+        #
+        # post 1.6 format output
+        #
+        if match[:id] == id
+          if tempfile.nil?
+            puts "#{match[:indent]}#{match[:output]}"
+          else
+            tempfile.write("#{match[:indent]}#{match[:output]}\n")
+          end
+        end
       end
     end
-    if @object_walker_end_re.match(line)
-      break
+    match = @object_walker_end_re.match(line)
+    if match
+      if id.nil?
+        break
+      else
+        if match[:id] == id
+          break
+        end
+      end
     end
   end
 end
