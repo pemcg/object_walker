@@ -33,11 +33,13 @@
 #               1.6     06-Oct-2015     Refactored several internal methods. Add unique ID to dump output to allow interleaved dumps
 #                                       to be detected. Added object hierarchy dump. Changed output format slightly. Allow for an
 #                                       override of @walk_association_whitelist to be input via a dialog element named 'dialog_walk_association_whitelist'
+#               1.6.1   19-Oct-2015     Reformatted the walk_association white/blacklists for appearance
+#               1.6.2   30-Oct-2015     Re-wrote dump_object_hierarchy to include walk_object_hierarchy. Now walks (correctly) the entire structure.
 #
 require 'active_support/core_ext/string'
 require 'securerandom'
 
-VERSION = "1.6"
+VERSION = "1.6.2"
 #
 @recursion_level = 0
 @object_recorder = {}
@@ -80,23 +82,25 @@ MAX_RECURSION_LEVEL = 7
 # If you wish to explore and dump this association, edit the hash to add the association name to the list associated with the object type. The symbol
 # :ALL can be used to walk all associations of an object type
 #
-@walk_association_whitelist = { 'MiqAeServiceServiceTemplateProvisionTask' => ['source', 'destination', 'miq_request', 'miq_request_tasks', 'service_resource'],
-                                'MiqAeServiceServiceTemplateProvisionRequest' => ['miq_request', 'miq_request_tasks', 'requester', 'resource', 'source'],
-                                'MiqAeServiceServiceTemplate' => ['service_resources'],
-                                'MiqAeServiceServiceResource' => ['resource', 'service_template'],
-                                'MiqAeServiceMiqProvisionRequest' => ['miq_request', 'miq_request_tasks', \
-                                                                      'miq_provisions', 'requester', 'resource', 'source', 'vm_template'],
-                                'MiqAeServiceMiqProvisionRequestTemplate' => ['miq_request', 'miq_request_tasks'],
-                                'MiqAeServiceMiqProvisionVmware' => ['source', 'destination', 'miq_provision_request', 'miq_request', 'miq_request_task', 'vm', \
-                                                                     'vm_template'],
-                                'MiqAeServiceMiqProvisionRedhat' => [:ALL],
-                                'MiqAeServiceMiqProvisionRedhatViaPxe' => [:ALL],
-                                'MiqAeServiceVmVmware' => ['ems_cluster', 'ems_folder', 'resource_pool', 'ext_management_system', 'storage', 'service', 'hardware', \
-                                                           'operating_system'],
-                                'MiqAeServiceVmRedhat' => ['ems_cluster', 'ems_folder', 'resource_pool', 'ext_management_system', 'storage', 'service', 'hardware'],
-                                'MiqAeServiceHardware' => ['nics', 'guest_devices', 'ports', 'vm' ],
-                                'MiqAeServiceUser' => ['current_group'],
-                                'MiqAeServiceGuestDevice' => ['hardware', 'lan', 'network']}
+@walk_association_whitelist = { 'MiqAeServiceServiceTemplateProvisionTask'    => ['source', 'destination', 'miq_request', 'miq_request_tasks',
+                                                                                  'service_resource'],
+                                'MiqAeServiceServiceTemplateProvisionRequest' => ['miq_request', 'miq_request_tasks', 'requester', 'resource',
+                                                                                  'source'],
+                                'MiqAeServiceServiceTemplate'                 => ['service_resources'],
+                                'MiqAeServiceServiceResource'                 => ['resource', 'service_template'],
+                                'MiqAeServiceMiqProvisionRequest'             => ['miq_request', 'miq_request_tasks', 'miq_provisions',
+                                                                                  'requester', 'resource', 'source', 'vm_template'],
+                                'MiqAeServiceMiqProvisionRequestTemplate'     => ['miq_request', 'miq_request_tasks'],
+                                'MiqAeServiceMiqProvisionVmware'              => ['source', 'destination', 'miq_provision_request',
+                                                                                  'miq_request', 'miq_request_task', 'vm', 'vm_template'],
+                                'MiqAeServiceMiqProvisionRedhat'              => [:ALL],
+                                'MiqAeServiceVmVmware'                        => ['ems_cluster', 'ems_folder', 'resource_pool', 'service',
+                                                                                  'ext_management_system', 'storage',  'hardware', 'operating_system'],
+                                'MiqAeServiceVmRedhat'                        => ['ems_cluster', 'ems_folder', 'resource_pool', 'ext_management_system',
+                                                                                  'storage', 'service', 'hardware'],
+                                'MiqAeServiceHardware'                        => ['nics', 'guest_devices', 'ports', 'vm' ],
+                                'MiqAeServiceUser'                            => ['current_group'],
+                                'MiqAeServiceGuestDevice'                     => ['hardware', 'lan', 'network']}
 #
 # if @walk_association_policy = :blacklist, then object_walker will traverse all associations of all objects, except those
 # that are explicitly mentioned in the @walk_association_blacklist hash. This enables us to run a more exploratory dump, at the cost of a
@@ -104,38 +108,66 @@ MAX_RECURSION_LEVEL = 7
 #
 # You have been warned, using a blacklist walk_association_policy produces a lot of output!
 #
-@walk_association_blacklist = { 'MiqAeServiceEmsRedhat' => ['ems_events'],
-                                'MiqAeServiceEmsVmware' => ['ems_events'],
-                                'MiqAeServiceEmsCluster' => ['all_vms', 'vms', 'ems_events'],
-                                'MiqAeServiceHostRedhat' => ['guest_applications', 'ems_events'],
+@walk_association_blacklist = { 'MiqAeServiceEmsRedhat'     => ['ems_events'],
+                                'MiqAeServiceEmsVmware'     => ['ems_events'],
+                                'MiqAeServiceEmsCluster'    => ['all_vms', 'vms', 'ems_events'],
+                                'MiqAeServiceHostRedhat'    => ['guest_applications', 'ems_events'],
                                 'MiqAeServiceHostVmwareEsx' => ['guest_applications', 'ems_events']}
 
 #-------------------------------------------------------------------------------------------------------------
-# Method:       print_object_hierarchy
-# Purpose:      Prints the object hierarchy from $evmm.root down to $evm.object
-# Arguments:    None 
+# Method:       walk_automation_objects
+# Purpose:      Recursively walk and record the automation object hierarchy from $evm.root downwards
+# Arguments:    service_object 
+# Returns:      A completed Struct::ServiceObject data structure
+#-------------------------------------------------------------------------------------------------------------
+
+def walk_automation_objects(service_object)
+  automation_object = Struct::ServiceObject.new(service_object.to_s, "", Array.new)
+  if service_object.to_s == $evm.root.to_s
+    automation_object.position = 'root'
+  elsif service_object.to_s == $evm.parent.to_s
+    automation_object.position = 'parent'
+  elsif service_object.to_s == $evm.object.to_s
+    automation_object.position = 'object'
+  end
+  kids = service_object.children
+  unless kids.nil? || (kids.kind_of?(Array) and kids.length.zero?)
+    Array.wrap(kids).each do |child|
+      automation_object.children << walk_automation_objects(child)
+    end
+  end
+  return automation_object
+end
+
+# End of walk_object_hierarchy
+#-------------------------------------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------------------------------------
+# Method:       list_automation_objects
+# Purpose:      recursively walk & dump the service object hierarchy discovered by walk_automation_objects
+# Arguments:    hierarchy: the service object hierarchy
+#               indent: the indentation string
 # Returns:      Nothing
 #-------------------------------------------------------------------------------------------------------------
 
-def print_object_hierarchy
-  dump_line("     ", "$evm.root = #{$evm.root}")
-  indent = "  "
-  child = $evm.root.children
-  until child.kind_of?(Array) and child.length.zero?
-    case child.to_s
-    when $evm.object.to_s
-      dump_line("     ", "#{indent}$evm.object = #{child.to_s}")
-    when $evm.parent.to_s
-      dump_line("     ", "#{indent}$evm.parent = #{child.to_s}")
-    else
-      dump_line("     ", "#{indent}$evm.root child = #{child.to_s}")
-    end
-    indent += "  "
-    child = child.children
+def list_automation_objects(hierarchy, indent)
+  case hierarchy.position
+  when 'root'
+    dump_line(indent, "#{hierarchy.obj_name}  ($evm.root)")
+  when 'parent'
+    dump_line(indent, "#{hierarchy.obj_name}  ($evm.parent)")
+  when 'object'
+    dump_line(indent, "#{hierarchy.obj_name}  ($evm.object)")
+  else
+    dump_line(indent, "#{hierarchy.obj_name}")
+  end
+  indent += "|    "
+  hierarchy.children.each do |child|
+    list_automation_objects(child, indent)
   end
 end
 
-# End of print_object_hierarchy
+# End of dump_object_hierarchy
 #-------------------------------------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------------------------------------
@@ -150,8 +182,7 @@ def dump_line(indent, string)
   $evm.log("info", "#{indent}#{@method}:   #{string}")
 end
 
-# End of dump_line
-#-------------------------------------------------------------------------------------------------------------
+# End of dump_linedumps
 
 #-------------------------------------------------------------------------------------------------------------
 # Method:       type
@@ -704,8 +735,11 @@ dump_line("     ", "$evm.current_method = #{$evm.current_method}   #{type($evm.c
 #
 # and now dump the object hierarchy...
 #
-dump_line("     ", "--- object hierarchy ---")
-print_object_hierarchy
+dump_line("     ", "--- automation instance hierarchy ---")
+Struct.new('ServiceObject', :obj_name, :position, :children)
+# automation_object_hierarchy = Struct::ServiceObject.new(nil, nil, Array.new)
+automation_object_hierarchy = walk_automation_objects($evm.root)
+list_automation_objects(automation_object_hierarchy, "     ")
 #
 # then dump $evm.root...
 #
