@@ -52,31 +52,34 @@
 #               1.2     11-May-2015     Re-factored, and added --diff switch
 #               1.3     06-Oct-2015     Changed regexes to match pre or post 1.6 format object_walker dumps. No longer print 'object_walker'
 #                                       for each line. Strip the ID from 1.6 format object_walker dumps.
+#               1.4     02-Nov-2015     Print continuation lines where a value is multi-line
+#               1.7     08-Dec-2015     Bumping version to match object_walker 1.7. We now handle the indentation string here
 #  
 
 require 'optparse'
 require 'tempfile'
+
+VERSION = "1.7"
 @debug = false
 
 valid_timestamp_re = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}/
 #
-# Match pre and post 1.6 format object_walker dumps
+# Match 1.7 format object_walker dumps
 #
 @object_walker_start_re = %r{
                             ----\]\ I,\ \[(?<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6})
-                            \ .*[Oo]bject_*[Ww]alker\ .*\ -\ EVM\ Automate\ Method\ Started
-                            |
-                            ----\]\ I,\ \[(?<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6})
-                            \ .*[Oo]bject_*[Ww]alk.*?(?<id>\#\w+):\ \ \ Object\ Walker\ (?<version>.+)\ Starting
+                            \ .*[Oo]bject_*[Ww]alk.*?(?<id>\#\w+):\ \ \ (?<output>Object\ Walker\ (?<version>.+)\ Starting)
                           }x
 @object_walker_body_re = %r{
-                          .*AEMethod\ [Oo]bject_*[Ww]alk.*>\ (?<indent>[\s|]*)
-                          [Oo]bject_*[Ww]alk.*?(?<id>\#\w+)*:*(\ \ \ |\ -\ )(?<output>.*)
+                          .*AEMethod\ [Oo]bject_*[Ww]alk.*>\ [Oo]bject_*[Ww]alk.*?(?<id>\#\w+)*:
+                          \[(?<indent_level>\d+)\]\ (?<output>.*)
+                          |
+                          .*ERROR.*AEMethod\ [Oo]bject_*[Ww]alk.*>\ [Oo]bject_*[Ww]alk.*?(?<id>\#\w+)*\ (?<output>.*)
+                          |
+                          (?<continuation_line>^[^\[].+$)
                           }x
 @object_walker_end_re = %r{
-                          [Oo]bject_*[Ww]alker\ -\ EVM\ Automate\ Method\ Ended
-                          |
-                          [Oo]bject_*[Ww]alk.*?(?<id>\#\w+):\ \ \ Object\ Walker\ Complete
+                          [Oo]bject_*[Ww]alk.*?(?<id>\#\w+):\ \ \ (?<output>Object\ Walker\ Complete)
                           }x
 
 #-------------------------------------------------------------------------------------------------------------
@@ -93,6 +96,18 @@ def list_dumps(file)
       puts "Found object_walker dump at #{match[:timestamp]}"
     end
   end
+end
+
+#-------------------------------------------------------------------------------------------------------------
+# Method:       indent_level_to_string
+# Purpose:      Converts an indentation level integer to the equivalent string
+# Arguments:    indent_level - an integer
+# Returns:      the string
+#-------------------------------------------------------------------------------------------------------------
+
+def indent_level_to_string(indent_level)
+  base_indent = "     "
+  return base_indent += "|    " * indent_level.to_i
 end
 
 #-------------------------------------------------------------------------------------------------------------
@@ -137,39 +152,46 @@ def find_dump(file, timestamp=nil, tempfile=nil)
   # Now rewind to the specified dump output and print the object_walker dump
   #
   file.seek(dump_start)
+  indent_level = 0
   file.each do |line|
+    match = @object_walker_start_re.match(line)
+    if match
+      if match[:id] == id
+        if tempfile.nil?
+          puts "#{match[:output]}"
+        else
+          tempfile.write("#{match[:output]}\n")
+        end
+      end
+    end
     match = @object_walker_body_re.match(line)
     if match
-      if id.nil?
-        #
-        # pre 1.6 format output
-        #
+      if match[:continuation_line]
         if tempfile.nil?
-          puts "#{match[:indent]}#{match[:output]}"
+          puts "#{indent_level_to_string(indent_level)}#{line}"
         else
-          tempfile.write("#{match[:indent]}#{match[:output]}\n")
+          tempfile.write("#{indent_level_to_string(indent_level)}#{line}\n")
         end
-      else
-        #
-        # post 1.6 format output
-        #
-        if match[:id] == id
-          if tempfile.nil?
-            puts "#{match[:indent]}#{match[:output]}"
-          else
-            tempfile.write("#{match[:indent]}#{match[:output]}\n")
-          end
+      elsif match[:id] == id
+        if match[:indent_level]
+          indent_level = match[:indent_level]
+        end
+        if tempfile.nil?
+          puts "#{indent_level_to_string(indent_level)}#{match[:output]}"
+        else
+          tempfile.write("#{indent_level_to_string(indent_level)}#{match[:output]}\n")
         end
       end
     end
     match = @object_walker_end_re.match(line)
     if match
-      if id.nil?
-        break
-      else
-        if match[:id] == id
-          break
+      if match[:id] == id
+        if tempfile.nil?
+          puts "#{match[:output]}"
+        else
+          tempfile.write("#{match[:output]}\n")
         end
+        break
       end
     end
   end
