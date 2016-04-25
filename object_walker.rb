@@ -37,11 +37,12 @@
 #               1.6.2   30-Oct-2015     Re-wrote dump_object_hierarchy to include walk_object_hierarchy. Now walks (correctly) the entire structure.
 #               1.7     08-Dec-2015     Re-work indentation. We now indicate indentation level as a numeric value, and let the reader insert the
 #                                       actual indent space string. Also add some of the new CFME 5.5 format objects to the whitelist
+#               1.7.1   25-Apr-2016     Added more of the base methods to the methods listing of objects
 #
 require 'active_support/core_ext/string'
 require 'securerandom'
 
-VERSION = "1.7"
+VERSION = "1.7.1"
 #
 @recursion_level = 0
 @object_recorder = {}
@@ -128,6 +129,15 @@ MAX_RECURSION_LEVEL = 7
                                                                       'miq_request_task',
                                                                       'vm',
                                                                       'vm_template'
+                                                                      ],
+  'MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Provision'  => ['source',
+                                                                      'destination',
+                                                                      'miq_provision_request',
+                                                                      'miq_request',
+                                                                      'miq_request_task',
+                                                                      'vm',
+                                                                      'vm_template',
+                                                                      'tenant'
                                                                       ],
   'MiqAeServiceVmVmware'                                          => ['ems_cluster',
                                                                       'ems_folder',
@@ -713,9 +723,10 @@ def dump_methods(object_string, this_object)
                          "#{instance_methods & @service_mode_base_instance_methods}") if @debug
         instance_methods -= @service_mode_base_instance_methods
         #
-        # Add in the tag methods as it's useful to show that they can be used with this object
+        # Add in the base methods as it's useful to show that they can be used with this object
         #
-        instance_methods += ['tags', 'tag_assign', 'tag_unassign', 'tagged_with?']
+        instance_methods += ['inspect', 'inspect_all', 'reload', 'model_suffix',
+                             'tags', 'tag_assign', 'tag_unassign', 'tagged_with?']
         #
         # and finally dump out the list
         #
@@ -806,6 +817,7 @@ randomstring = SecureRandom.hex(4).upcase
 @method = "object_walker##{randomstring}"
 
 $evm.log("info", "#{@method}:   Object Walker #{VERSION} Starting")
+dump_line(0, "Attributes with nil values are not displayed") if !@print_nil_values
 
 if @dump_methods
   #
