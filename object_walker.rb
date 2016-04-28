@@ -817,7 +817,7 @@ randomstring = SecureRandom.hex(4).upcase
 @method = "object_walker##{randomstring}"
 
 $evm.log("info", "#{@method}:   Object Walker #{VERSION} Starting")
-dump_line(0, "Attributes with nil values are not displayed") if !@print_nil_values
+dump_line(0, "*** detected '@print_nil_values = false' so attributes with nil values will not be printed ***") if !@print_nil_values
 
 if @dump_methods
   #
