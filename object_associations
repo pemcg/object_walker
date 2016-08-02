@@ -1,0 +1,458 @@
+
+"MiqAeServiceAccount": ["host", "vm_or_template"]
+
+"MiqAeServiceAutomationRequest": ["automation_tasks", "destination", "miq_request_tasks", "requester", "resource", "source", "tenant"]
+
+"MiqAeServiceAutomationTask": ["automation_request", "destination", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant"]
+
+"MiqAeServiceAvailabilityZone": ["cloud_subnets", "ext_management_system", "vms", "vms_and_templates"]
+
+"MiqAeServiceClassification": ["parent"]
+
+"MiqAeServiceCloudNetwork": ["cloud_subnets", "cloud_tenant", "ext_management_system", "floating_ips", "network_ports", "network_routers", "security_groups", "vms"]
+
+"MiqAeServiceCloudObjectStoreContainer": ["cloud_object_store_objects", "cloud_tenant", "ext_management_system"]
+
+"MiqAeServiceCloudObjectStoreObject": ["cloud_object_store_container", "cloud_tenant", "ext_management_system"]
+
+"MiqAeServiceCloudResourceQuota": ["cloud_tenant", "ext_management_system"]
+
+"MiqAeServiceCloudSubnet": ["availability_zone", "cloud_network", "vms"]
+
+"MiqAeServiceCloudTenant": ["cloud_networks", "cloud_resource_quotas", "ext_management_system", "floating_ips", "miq_templates", "security_groups", "vms", "vms_and_templates"]
+
+"MiqAeServiceCloudVolume": ["attachments", "availability_zone", "base_snapshot", "cloud_tenant", "cloud_volume_snapshots", "ext_management_system"]
+
+"MiqAeServiceCloudVolumeSnapshot": ["based_volumes", "cloud_tenant", "cloud_volume", "ext_management_system"]
+
+"MiqAeServiceConfigurationArchitecture": ["configuration_profiles", "configured_systems", "manager"]
+
+"MiqAeServiceConfigurationComputeProfile": ["configuration_profiles", "configured_systems", "manager"]
+
+"MiqAeServiceConfigurationDomain": ["configuration_profiles", "configured_systems", "manager"]
+
+"MiqAeServiceConfigurationEnvironment": ["configuration_profiles", "configured_systems", "manager"]
+
+"MiqAeServiceConfigurationLocation": ["parent", "provisioning_manager"]
+
+"MiqAeServiceConfigurationOrganization": ["parent", "provisioning_manager"]
+
+"MiqAeServiceConfigurationProfile": ["configured_systems", "customization_script_medium", "customization_script_ptable", "manager", "operating_system_flavors", "parent"]
+
+"MiqAeServiceConfigurationRealm": ["configuration_profiles", "configured_systems", "manager"]
+
+"MiqAeServiceConfigurationScript": ["inventory_root_group", "manager"]
+
+"MiqAeServiceConfigurationTag": ["configuration_profiles", "configured_systems", "manager"]
+
+"MiqAeServiceConfiguredSystem": ["computer_system", "configuration_location", "configuration_profile", "customization_script_media", "customization_script_ptable", "manager", "operating_system_flavor"]
+
+"MiqAeServiceCustomEvent": ["dest_host", "dest_vm", "ems", "ext_management_system", "host", "service", "src_host", "src_vm", "vm"]
+
+"MiqAeServiceCustomizationScript": ["provisioning_manager"]
+
+"MiqAeServiceCustomizationScriptMedium": ["provisioning_manager"]
+
+"MiqAeServiceCustomizationScriptPtable": ["provisioning_manager"]
+
+"MiqAeServiceCustomizationSpec": ["ext_management_system"]
+
+"MiqAeServiceCustomizationTemplate": ["pxe_images"]
+
+"MiqAeServiceCustomizationTemplateCloudInit": ["pxe_images"]
+
+"MiqAeServiceCustomizationTemplateKickstart": ["pxe_images"]
+
+"MiqAeServiceCustomizationTemplateSysprep": ["pxe_images"]
+
+"MiqAeServiceDatacenter": ["hosts", "vms"]
+
+"MiqAeServiceDisk": ["backing", "hardware", "storage"]
+
+"MiqAeServiceEmsCluster": ["all_resource_pools", "all_vms", "default_resource_pool", "ems_events", "ext_management_system", "hosts", "parent_folder", "resource_pools", "storages", "vms"]
+
+"MiqAeServiceEmsEvent": ["dest_host", "dest_vm", "ems", "ext_management_system", "host", "service", "src_host", "src_vm", "vm"]
+
+"MiqAeServiceEmsFolder": ["hosts", "vms"]
+
+"MiqAeServiceEmsInfra": ["customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceEventStream": ["dest_host", "dest_vm", "ems", "ext_management_system", "host", "service", "src_host", "src_vm", "vm"]
+
+"MiqAeServiceExtManagementSystem": ["customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceFirewallRule": ["resource", "source_security_group"]
+
+"MiqAeServiceFlavor": ["ext_management_system", "vms"]
+
+"MiqAeServiceFloatingIp": ["cloud_tenant", "ext_management_system", "vm"]
+
+"MiqAeServiceGuestApplication": ["host", "vm"]
+
+"MiqAeServiceGuestDevice": ["hardware", "lan", "network", "switch"]
+
+"MiqAeServiceHardware": ["guest_devices", "host", "networks", "nics", "ports", "storage_adapters", "vm"]
+
+"MiqAeServiceHost": ["datacenter", "directories", "ems_cluster", "ems_events", "ems_folder", "ext_management_system", "files", "guest_applications", "hardware", "lans", "operating_system", "storages", "switches", "vms"]
+
+"MiqAeServiceLan": ["guest_devices", "hosts", "switch", "templates", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_CloudManager": ["availability_zones", "cloud_networks", "cloud_resource_quotas", "cloud_tenants", "customization_specs", "ems_clusters", "ems_events", "ems_folders", "flavors", "floating_ips", "hosts", "key_pairs", "miq_templates", "network_manager", "orchestration_stacks", "private_networks", "provider", "public_networks", "resource_pools", "security_groups", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_CloudManager_AvailabilityZone": ["cloud_subnets", "ext_management_system", "vms", "vms_and_templates"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_CloudManager_CloudVolume": ["attachments", "availability_zone", "base_snapshot", "cloud_tenant", "cloud_volume_snapshots", "ext_management_system"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_CloudManager_CloudVolumeSnapshot": ["based_volumes", "cloud_tenant", "cloud_volume", "ext_management_system"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_CloudManager_Flavor": ["ext_management_system", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_CloudManager_OrchestrationStack": ["cloud_networks", "ext_management_system", "orchestration_template", "outputs", "parameters", "resources", "security_groups", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_CloudManager_Provision": ["destination", "eligible_availability_zones", "eligible_cloud_networks", "eligible_cloud_subnets", "eligible_cloud_tenants", "eligible_clusters", "eligible_customization_templates", "eligible_floating_ip_addresses", "eligible_folders", "eligible_guest_access_key_pairs", "eligible_hosts", "eligible_instance_types", "eligible_iso_images", "eligible_pxe_images", "eligible_pxe_servers", "eligible_resource_pools", "eligible_security_groups", "eligible_storages", "eligible_windows_images", "miq_provision_request", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant", "vm", "vm_template"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_CloudManager_Template": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_CloudManager_Vm": ["accounts", "availability_zone", "cloud_network", "cloud_subnet", "cloud_subnets", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "flavor", "floating_ip", "groups", "guest_applications", "hardware", "host", "key_pairs", "miq_provision", "network_ports", "network_routers", "operating_system", "resource_pool", "security_groups", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_NetworkManager": ["cloud_networks", "cloud_subnets", "customization_specs", "ems_clusters", "ems_events", "ems_folders", "floating_ips", "hosts", "miq_templates", "network_ports", "network_routers", "parent_manager", "private_networks", "provider", "public_networks", "resource_pools", "security_groups", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_NetworkManager_CloudNetwork": ["cloud_subnets", "cloud_tenant", "ext_management_system", "floating_ips", "network_ports", "network_routers", "security_groups", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_NetworkManager_CloudSubnet": ["availability_zone", "cloud_network", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_NetworkManager_FloatingIp": ["cloud_tenant", "ext_management_system", "vm"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_NetworkManager_NetworkPort": ["cloud_subnet", "cloud_tenant", "device", "ext_management_system"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_NetworkManager_NetworkRouter": ["cloud_tenant", "ext_management_system", "floating_ips", "network_ports", "private_networks", "public_network", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Amazon_NetworkManager_SecurityGroup": ["cloud_network", "cloud_tenant", "ext_management_system", "firewall_rules", "vms"]
+
+"MiqAeServiceManageIQ_Providers_AnsibleTower_ConfigurationManager": ["configuration_profiles", "configuration_scripts", "configured_systems", "customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_AnsibleTower_ConfigurationManager_ConfigurationScript": ["inventory_root_group", "manager"]
+
+"MiqAeServiceManageIQ_Providers_AnsibleTower_ConfigurationManager_ConfiguredSystem": ["computer_system", "configuration_location", "configuration_profile", "customization_script_media", "customization_script_ptable", "manager", "operating_system_flavor"]
+
+"MiqAeServiceManageIQ_Providers_AnsibleTower_ConfigurationManager_Job": ["ext_management_system", "job_template", "outputs", "parameters", "resources"]
+
+"MiqAeServiceManageIQ_Providers_AnsibleTower_Provider": ["configuration_manager", "managers", "tenant", "zone"]
+
+"MiqAeServiceManageIQ_Providers_AtomicEnterprise_ContainerManager": ["customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Atomic_ContainerManager": ["customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Azure_CloudManager": ["availability_zones", "cloud_networks", "cloud_resource_quotas", "cloud_tenants", "customization_specs", "ems_clusters", "ems_events", "ems_folders", "flavors", "floating_ips", "hosts", "key_pairs", "miq_templates", "network_manager", "orchestration_stacks", "private_networks", "provider", "public_networks", "resource_groups", "resource_pools", "security_groups", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Azure_CloudManager_AvailabilityZone": ["cloud_subnets", "ext_management_system", "vms", "vms_and_templates"]
+
+"MiqAeServiceManageIQ_Providers_Azure_CloudManager_Flavor": ["ext_management_system", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Azure_CloudManager_OrchestrationStack": ["cloud_networks", "ext_management_system", "orchestration_template", "outputs", "parameters", "resources", "security_groups", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Azure_CloudManager_Provision": ["destination", "eligible_availability_zones", "eligible_cloud_networks", "eligible_cloud_subnets", "eligible_cloud_tenants", "eligible_clusters", "eligible_customization_templates", "eligible_floating_ip_addresses", "eligible_folders", "eligible_guest_access_key_pairs", "eligible_hosts", "eligible_instance_types", "eligible_iso_images", "eligible_pxe_images", "eligible_pxe_servers", "eligible_resource_groups", "eligible_resource_pools", "eligible_security_groups", "eligible_storages", "eligible_windows_images", "miq_provision_request", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant", "vm", "vm_template"]
+
+"MiqAeServiceManageIQ_Providers_Azure_CloudManager_Template": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_Azure_CloudManager_Vm": ["accounts", "availability_zone", "cloud_network", "cloud_networks", "cloud_subnet", "cloud_subnets", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "flavor", "floating_ip", "floating_ips", "groups", "guest_applications", "hardware", "host", "key_pairs", "miq_provision", "network_ports", "network_routers", "operating_system", "resource_pool", "security_groups", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_Azure_NetworkManager": ["cloud_networks", "cloud_subnets", "customization_specs", "ems_clusters", "ems_events", "ems_folders", "floating_ips", "hosts", "miq_templates", "network_ports", "network_routers", "parent_manager", "private_networks", "provider", "public_networks", "resource_pools", "security_groups", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Azure_NetworkManager_CloudNetwork": ["cloud_subnets", "cloud_tenant", "ext_management_system", "floating_ips", "network_ports", "network_routers", "security_groups", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Azure_NetworkManager_CloudSubnet": ["availability_zone", "cloud_network", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Azure_NetworkManager_FloatingIp": ["cloud_tenant", "ext_management_system", "vm"]
+
+"MiqAeServiceManageIQ_Providers_Azure_NetworkManager_NetworkPort": ["cloud_subnet", "cloud_tenant", "device", "ext_management_system"]
+
+"MiqAeServiceManageIQ_Providers_Azure_NetworkManager_NetworkRouter": ["cloud_tenant", "ext_management_system", "floating_ips", "network_ports", "private_networks", "public_network", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Azure_NetworkManager_SecurityGroup": ["cloud_network", "cloud_tenant", "ext_management_system", "firewall_rules", "vms"]
+
+"MiqAeServiceManageIQ_Providers_BaseManager": ["customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_CloudManager": ["availability_zones", "cloud_networks", "cloud_resource_quotas", "cloud_tenants", "customization_specs", "ems_clusters", "ems_events", "ems_folders", "flavors", "floating_ips", "hosts", "key_pairs", "miq_templates", "network_manager", "orchestration_stacks", "private_networks", "provider", "public_networks", "resource_pools", "security_groups", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_CloudManager_OrchestrationStack": ["cloud_networks", "ext_management_system", "orchestration_template", "outputs", "parameters", "resources", "security_groups", "vms"]
+
+"MiqAeServiceManageIQ_Providers_CloudManager_Provision": ["destination", "eligible_availability_zones", "eligible_cloud_networks", "eligible_cloud_subnets", "eligible_cloud_tenants", "eligible_clusters", "eligible_customization_templates", "eligible_floating_ip_addresses", "eligible_folders", "eligible_guest_access_key_pairs", "eligible_hosts", "eligible_instance_types", "eligible_iso_images", "eligible_pxe_images", "eligible_pxe_servers", "eligible_resource_pools", "eligible_security_groups", "eligible_storages", "eligible_windows_images", "miq_provision_request", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant", "vm", "vm_template"]
+
+"MiqAeServiceManageIQ_Providers_CloudManager_Template": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_CloudManager_Vm": ["accounts", "availability_zone", "cloud_network", "cloud_subnet", "cloud_subnets", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "flavor", "floating_ip", "groups", "guest_applications", "hardware", "host", "key_pairs", "miq_provision", "network_ports", "network_routers", "operating_system", "resource_pool", "security_groups", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_ConfigurationManager": ["configuration_profiles", "configured_systems", "customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_ConfigurationManager_InventoryGroup": ["hosts", "manager", "vms"]
+
+"MiqAeServiceManageIQ_Providers_ConfigurationManager_InventoryRootGroup": ["configuration_scripts", "hosts", "manager", "vms"]
+
+"MiqAeServiceManageIQ_Providers_ContainerManager": ["customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Foreman_ConfigurationManager": ["configuration_profiles", "configured_systems", "customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Foreman_ConfigurationManager_ConfigurationProfile": ["configuration_tags", "configured_systems", "customization_script_medium", "customization_script_ptable", "direct_configuration_tags", "direct_customization_script_medium", "direct_customization_script_ptable", "direct_operating_system_flavors", "manager", "operating_system_flavors", "parent", "parent"]
+
+"MiqAeServiceManageIQ_Providers_Foreman_ConfigurationManager_ConfiguredSystem": ["computer_system", "configuration_location", "configuration_profile", "configuration_profile", "configuration_tags", "customization_script_media", "customization_script_ptable", "direct_configuration_tags", "direct_customization_script_media", "direct_customization_script_ptable", "manager", "operating_system_flavor"]
+
+"MiqAeServiceManageIQ_Providers_Foreman_ConfigurationManager_ProvisionTask": ["destination", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant"]
+
+"MiqAeServiceManageIQ_Providers_Foreman_Provider": ["configuration_manager", "managers", "provisioning_manager", "tenant", "zone"]
+
+"MiqAeServiceManageIQ_Providers_Foreman_ProvisioningManager": ["customization_scripts", "customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "operating_system_flavors", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Google_CloudManager": ["availability_zones", "cloud_networks", "cloud_resource_quotas", "cloud_tenants", "customization_specs", "ems_clusters", "ems_events", "ems_folders", "flavors", "floating_ips", "hosts", "key_pairs", "miq_templates", "network_manager", "orchestration_stacks", "private_networks", "provider", "public_networks", "resource_pools", "security_groups", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Google_CloudManager_AvailabilityZone": ["cloud_subnets", "ext_management_system", "vms", "vms_and_templates"]
+
+"MiqAeServiceManageIQ_Providers_Google_CloudManager_CloudVolumeSnapshot": ["based_volumes", "cloud_tenant", "cloud_volume", "ext_management_system"]
+
+"MiqAeServiceManageIQ_Providers_Google_CloudManager_Flavor": ["ext_management_system", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Google_CloudManager_Provision": ["destination", "eligible_availability_zones", "eligible_cloud_networks", "eligible_cloud_subnets", "eligible_cloud_tenants", "eligible_clusters", "eligible_customization_templates", "eligible_floating_ip_addresses", "eligible_folders", "eligible_guest_access_key_pairs", "eligible_hosts", "eligible_instance_types", "eligible_iso_images", "eligible_pxe_images", "eligible_pxe_servers", "eligible_resource_pools", "eligible_security_groups", "eligible_storages", "eligible_windows_images", "miq_provision_request", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant", "vm", "vm_template"]
+
+"MiqAeServiceManageIQ_Providers_Google_CloudManager_SecurityGroup": ["cloud_network", "cloud_tenant", "ext_management_system", "firewall_rules", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Google_CloudManager_Template": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_Google_CloudManager_Vm": ["accounts", "availability_zone", "cloud_network", "cloud_subnet", "cloud_subnets", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "flavor", "floating_ip", "groups", "guest_applications", "hardware", "host", "key_pairs", "miq_provision", "network_ports", "network_routers", "operating_system", "resource_pool", "security_groups", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_InfraManager": ["customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_InfraManager_Template": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_InfraManager_Vm": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_Kubernetes_ContainerManager": ["customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Microsoft_InfraManager": ["customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Microsoft_InfraManager_Host": ["datacenter", "directories", "ems_cluster", "ems_events", "ems_folder", "ext_management_system", "files", "guest_applications", "hardware", "lans", "operating_system", "storages", "switches", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Microsoft_InfraManager_Provision": ["destination", "eligible_clusters", "eligible_customization_templates", "eligible_folders", "eligible_hosts", "eligible_iso_images", "eligible_pxe_images", "eligible_pxe_servers", "eligible_resource_pools", "eligible_storages", "eligible_windows_images", "miq_provision_request", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant", "vm", "vm_template"]
+
+"MiqAeServiceManageIQ_Providers_Microsoft_InfraManager_Template": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_Microsoft_InfraManager_Vm": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_MiddlewareManager": ["customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_NetworkManager": ["cloud_networks", "cloud_subnets", "customization_specs", "ems_clusters", "ems_events", "ems_folders", "floating_ips", "hosts", "miq_templates", "network_ports", "network_routers", "parent_manager", "private_networks", "provider", "public_networks", "resource_pools", "security_groups", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_OpenshiftEnterprise_ContainerManager": ["customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openshift_ContainerManager": ["customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_CloudManager": ["availability_zones", "cloud_networks", "cloud_resource_quotas", "cloud_tenants", "customization_specs", "ems_clusters", "ems_events", "ems_folders", "flavors", "floating_ips", "hosts", "key_pairs", "miq_templates", "network_manager", "orchestration_stacks", "private_networks", "provider", "public_networks", "resource_pools", "security_groups", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_CloudManager_AvailabilityZone": ["cloud_subnets", "ext_management_system", "vms", "vms_and_templates"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_CloudManager_AvailabilityZoneNull": ["cloud_subnets", "ext_management_system", "vms", "vms_and_templates"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_CloudManager_CloudResourceQuota": ["cloud_tenant", "ext_management_system"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_CloudManager_CloudTenant": ["cloud_networks", "cloud_resource_quotas", "ext_management_system", "floating_ips", "miq_templates", "security_groups", "vms", "vms_and_templates"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_CloudManager_CloudVolume": ["attachments", "availability_zone", "base_snapshot", "cloud_tenant", "cloud_volume_snapshots", "ext_management_system"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_CloudManager_CloudVolumeSnapshot": ["based_volumes", "cloud_tenant", "cloud_volume", "ext_management_system"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_CloudManager_Flavor": ["ext_management_system", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_CloudManager_OrchestrationStack": ["cloud_networks", "ext_management_system", "orchestration_template", "outputs", "parameters", "resources", "security_groups", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_CloudManager_Provision": ["destination", "eligible_availability_zones", "eligible_cloud_networks", "eligible_cloud_subnets", "eligible_cloud_tenants", "eligible_clusters", "eligible_customization_templates", "eligible_floating_ip_addresses", "eligible_folders", "eligible_guest_access_key_pairs", "eligible_hosts", "eligible_instance_types", "eligible_iso_images", "eligible_pxe_images", "eligible_pxe_servers", "eligible_resource_pools", "eligible_security_groups", "eligible_storages", "eligible_windows_images", "miq_provision_request", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant", "vm", "vm_template"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_CloudManager_Template": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_CloudManager_Vm": ["accounts", "availability_zone", "cloud_network", "cloud_networks", "cloud_networks", "cloud_subnet", "cloud_subnets", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "flavor", "floating_ip", "floating_ips", "groups", "guest_applications", "hardware", "host", "key_pairs", "miq_provision", "network_ports", "network_routers", "operating_system", "resource_pool", "security_groups", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_InfraManager": ["customization_specs", "direct_orchestration_stacks", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "orchestration_stacks", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_InfraManager_EmsCluster": ["all_resource_pools", "all_vms", "default_resource_pool", "ems_events", "ext_management_system", "hosts", "parent_folder", "resource_pools", "storages", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_InfraManager_Host": ["datacenter", "directories", "ems_cluster", "ems_events", "ems_folder", "ext_management_system", "files", "guest_applications", "hardware", "lans", "operating_system", "storages", "switches", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_InfraManager_OrchestrationStack": ["ext_management_system", "outputs", "parameters", "resources"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_InfraManager_Template": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_NetworkManager": ["cloud_networks", "cloud_subnets", "customization_specs", "ems_clusters", "ems_events", "ems_folders", "floating_ips", "hosts", "miq_templates", "network_ports", "network_routers", "parent_manager", "private_networks", "provider", "public_networks", "resource_pools", "security_groups", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_NetworkManager_CloudNetwork": ["cloud_subnets", "cloud_tenant", "ext_management_system", "floating_ips", "network_ports", "network_routers", "security_groups", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_NetworkManager_CloudNetwork_Private": ["cloud_subnets", "cloud_tenant", "ext_management_system", "floating_ips", "network_ports", "network_routers", "public_networks", "security_groups", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_NetworkManager_CloudNetwork_Public": ["cloud_subnets", "cloud_tenant", "ext_management_system", "floating_ips", "network_ports", "network_routers", "private_networks", "security_groups", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_NetworkManager_CloudSubnet": ["availability_zone", "cloud_network", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_NetworkManager_FloatingIp": ["cloud_tenant", "ext_management_system", "vm"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_NetworkManager_NetworkPort": ["cloud_subnet", "cloud_subnets", "cloud_tenant", "device", "ext_management_system", "network_routers", "public_networks"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_NetworkManager_NetworkRouter": ["cloud_tenant", "ext_management_system", "floating_ips", "network_ports", "private_networks", "public_network", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_NetworkManager_SecurityGroup": ["cloud_network", "cloud_tenant", "ext_management_system", "firewall_rules", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Openstack_Provider": ["cloud_ems", "infra_ems", "managers", "tenant", "zone"]
+
+"MiqAeServiceManageIQ_Providers_ProvisioningManager": ["customization_scripts", "customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "operating_system_flavors", "provider", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Redhat_InfraManager": ["customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Host": ["datacenter", "directories", "ems_cluster", "ems_events", "ems_folder", "ext_management_system", "files", "guest_applications", "hardware", "lans", "operating_system", "storages", "switches", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Provision": ["destination", "eligible_clusters", "eligible_customization_templates", "eligible_folders", "eligible_hosts", "eligible_iso_images", "eligible_pxe_images", "eligible_pxe_servers", "eligible_resource_pools", "eligible_storages", "eligible_windows_images", "miq_provision_request", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant", "vm", "vm_template"]
+
+"MiqAeServiceManageIQ_Providers_Redhat_InfraManager_ProvisionViaIso": ["destination", "eligible_clusters", "eligible_customization_templates", "eligible_folders", "eligible_hosts", "eligible_iso_images", "eligible_pxe_images", "eligible_pxe_servers", "eligible_resource_pools", "eligible_storages", "eligible_windows_images", "miq_provision_request", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant", "vm", "vm_template"]
+
+"MiqAeServiceManageIQ_Providers_Redhat_InfraManager_ProvisionViaPxe": ["destination", "eligible_clusters", "eligible_customization_templates", "eligible_folders", "eligible_hosts", "eligible_iso_images", "eligible_pxe_images", "eligible_pxe_servers", "eligible_resource_pools", "eligible_storages", "eligible_windows_images", "miq_provision_request", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant", "vm", "vm_template"]
+
+"MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Template": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Vm": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_Vmware_InfraManager": ["customization_specs", "ems_clusters", "ems_events", "ems_folders", "hosts", "miq_templates", "provider", "resource_pools", "storages", "tenant", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Vmware_InfraManager_Host": ["datacenter", "directories", "ems_cluster", "ems_events", "ems_folder", "ext_management_system", "files", "guest_applications", "hardware", "lans", "operating_system", "storages", "switches", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Vmware_InfraManager_HostEsx": ["datacenter", "directories", "ems_cluster", "ems_events", "ems_folder", "ext_management_system", "files", "guest_applications", "hardware", "lans", "operating_system", "storages", "switches", "vms"]
+
+"MiqAeServiceManageIQ_Providers_Vmware_InfraManager_Provision": ["destination", "eligible_clusters", "eligible_customization_templates", "eligible_folders", "eligible_hosts", "eligible_iso_images", "eligible_pxe_images", "eligible_pxe_servers", "eligible_resource_pools", "eligible_storages", "eligible_windows_images", "miq_provision_request", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant", "vm", "vm_template"]
+
+"MiqAeServiceManageIQ_Providers_Vmware_InfraManager_ProvisionViaPxe": ["destination", "eligible_clusters", "eligible_customization_templates", "eligible_folders", "eligible_hosts", "eligible_iso_images", "eligible_pxe_images", "eligible_pxe_servers", "eligible_resource_pools", "eligible_storages", "eligible_windows_images", "miq_provision_request", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant", "vm", "vm_template"]
+
+"MiqAeServiceManageIQ_Providers_Vmware_InfraManager_Template": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceManageIQ_Providers_Vmware_InfraManager_Vm": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceMiqEvent": ["dest_host", "dest_vm", "ems", "ext_management_system", "host", "service", "src_host", "src_vm", "vm"]
+
+"MiqAeServiceMiqGroup": ["tenant", "users", "vms"]
+
+"MiqAeServiceMiqHostProvision": ["destination", "host", "miq_host_provision_request", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant"]
+
+"MiqAeServiceMiqHostProvisionRequest": ["destination", "miq_host_provisions", "miq_request_tasks", "requester", "resource", "source", "tenant"]
+
+"MiqAeServiceMiqProvision": ["destination", "eligible_clusters", "eligible_customization_templates", "eligible_folders", "eligible_hosts", "eligible_iso_images", "eligible_pxe_images", "eligible_pxe_servers", "eligible_resource_pools", "eligible_storages", "eligible_windows_images", "miq_provision_request", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant", "vm", "vm_template"]
+
+"MiqAeServiceMiqProvisionConfiguredSystemRequest": ["destination", "miq_request_tasks", "requester", "resource", "source", "tenant"]
+
+"MiqAeServiceMiqProvisionRequest": ["destination", "eligible_clusters", "eligible_customization_templates", "eligible_folders", "eligible_hosts", "eligible_iso_images", "eligible_pxe_images", "eligible_pxe_servers", "eligible_resource_pools", "eligible_storages", "eligible_windows_images", "miq_provisions", "miq_request", "miq_request_tasks", "requester", "resource", "source", "tenant", "vm_template"]
+
+"MiqAeServiceMiqProvisionRequestTemplate": ["destination", "eligible_clusters", "eligible_customization_templates", "eligible_folders", "eligible_hosts", "eligible_iso_images", "eligible_pxe_images", "eligible_pxe_servers", "eligible_resource_pools", "eligible_storages", "eligible_windows_images", "miq_provisions", "miq_request", "miq_request_tasks", "requester", "resource", "source", "tenant", "vm_template"]
+
+"MiqAeServiceMiqProvisionTask": ["destination", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant"]
+
+"MiqAeServiceMiqRequest": ["destination", "miq_request_tasks", "requester", "resource", "source", "tenant"]
+
+"MiqAeServiceMiqRequestTask": ["destination", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant"]
+
+"MiqAeServiceMiqTemplate": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceNetwork": ["guest_device", "hardware"]
+
+"MiqAeServiceNetworkPort": ["cloud_subnet", "cloud_tenant", "device", "ext_management_system"]
+
+"MiqAeServiceNetworkRouter": ["cloud_tenant", "ext_management_system", "floating_ips", "network_ports", "private_networks", "public_network", "vms", "vms"]
+
+"MiqAeServiceOperatingSystemFlavor": ["provisioning_manager"]
+
+"MiqAeServiceOrchestrationStack": ["ext_management_system", "outputs", "parameters", "resources"]
+
+"MiqAeServiceOrchestrationStackOutput": ["stack"]
+
+"MiqAeServiceOrchestrationStackParameter": ["stack"]
+
+"MiqAeServiceOrchestrationStackResource": ["stack"]
+
+"MiqAeServiceOrchestrationTemplate": ["stacks"]
+
+"MiqAeServiceOrchestrationTemplateAzure": ["stacks"]
+
+"MiqAeServiceOrchestrationTemplateCfn": ["stacks"]
+
+"MiqAeServiceOrchestrationTemplateHot": ["stacks"]
+
+"MiqAeServiceProvider": ["managers", "tenant", "zone"]
+
+"MiqAeServicePxeImage": ["customization_templates", "pxe_server"]
+
+"MiqAeServicePxeImageIpxe": ["customization_templates", "pxe_server"]
+
+"MiqAeServicePxeImagePxelinux": ["customization_templates", "pxe_server"]
+
+"MiqAeServicePxeImageType": ["customization_templates", "iso_images", "pxe_images", "windows_images"]
+
+"MiqAeServicePxeServer": ["advertised_images", "advertised_pxe_images", "default_pxe_image_for_windows", "discovered_images", "discovered_pxe_images", "images", "pxe_images", "windows_images"]
+
+"MiqAeServiceRequestEvent": ["dest_host", "dest_vm", "ems", "ext_management_system", "host", "service", "src_host", "src_vm", "vm"]
+
+"MiqAeServiceSecurityGroup": ["cloud_network", "cloud_tenant", "ext_management_system", "firewall_rules", "vms"]
+
+"MiqAeServiceService": ["all_service_children", "direct_service_children", "direct_vms", "indirect_service_children", "indirect_vms", "parent_service", "root_service", "service_resources", "service_template", "tenant", "vms"]
+
+"MiqAeServiceServiceAnsibleTower": ["all_service_children", "direct_service_children", "direct_vms", "indirect_service_children", "indirect_vms", "parent_service", "root_service", "service_resources", "service_template", "tenant", "vms"]
+
+"MiqAeServiceServiceOrchestration": ["all_service_children", "direct_service_children", "direct_vms", "indirect_service_children", "indirect_vms", "parent_service", "root_service", "service_resources", "service_template", "tenant", "vms"]
+
+"MiqAeServiceServiceReconfigureRequest": ["destination", "miq_request_tasks", "requester", "resource", "source", "tenant"]
+
+"MiqAeServiceServiceReconfigureTask": ["destination", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant"]
+
+"MiqAeServiceServiceResource": ["resource", "service", "service_template", "source"]
+
+"MiqAeServiceServiceTemplate": ["service_resources", "service_templates", "services", "tenant"]
+
+"MiqAeServiceServiceTemplateAnsibleTower": ["service_resources", "service_templates", "services", "tenant"]
+
+"MiqAeServiceServiceTemplateOrchestration": ["service_resources", "service_templates", "services", "tenant"]
+
+"MiqAeServiceServiceTemplateProvisionRequest": ["destination", "miq_request_tasks", "requester", "resource", "source", "tenant"]
+
+"MiqAeServiceServiceTemplateProvisionTask": ["destination", "miq_request", "miq_request_task", "miq_request_tasks", "service_resource", "source", "tenant"]
+
+"MiqAeServiceSnapshot": ["vm_or_template"]
+
+"MiqAeServiceStorage": ["ext_management_systems", "files", "hosts", "storage_clusters", "storage_files", "unregistered_vms", "vms"]
+
+"MiqAeServiceStorageCluster": ["hosts", "vms"]
+
+"MiqAeServiceStorageFile": ["miq_template", "storage", "vm", "vm_or_template"]
+
+"MiqAeServiceSwitch": ["guest_devices", "host", "lans"]
+
+"MiqAeServiceTemplateCloud": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceTemplateInfra": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceTemplateXen": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceTenant": ["ae_domains", "ext_management_systems", "miq_groups", "miq_request_tasks", "miq_requests", "miq_templates", "providers", "service_templates", "services", "tenant_quotas", "users", "vm_or_templates", "vms"]
+
+"MiqAeServiceTenantQuota": ["tenant"]
+
+"MiqAeServiceUser": ["current_group", "current_tenant", "miq_requests", "vms"]
+
+"MiqAeServiceVm": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceVmCloud": ["accounts", "availability_zone", "cloud_network", "cloud_networks", "cloud_subnet", "cloud_subnets", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "flavor", "floating_ip", "floating_ips", "groups", "guest_applications", "hardware", "host", "key_pairs", "miq_provision", "network_ports", "network_routers", "operating_system", "resource_pool", "security_groups", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceVmInfra": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceVmMigrateRequest": ["destination", "miq_request_tasks", "requester", "resource", "source", "tenant"]
+
+"MiqAeServiceVmMigrateTask": ["destination", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant"]
+
+"MiqAeServiceVmOrTemplate": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceVmReconfigureRequest": ["destination", "miq_request_tasks", "requester", "resource", "source", "tenant"]
+
+"MiqAeServiceVmReconfigureTask": ["destination", "miq_request", "miq_request_task", "miq_request_tasks", "source", "tenant"]
+
+"MiqAeServiceVmXen": ["accounts", "datacenter", "direct_service", "directories", "ems_blue_folder", "ems_cluster", "ems_folder", "ext_management_system", "files", "groups", "guest_applications", "hardware", "host", "miq_provision", "operating_system", "resource_pool", "service", "snapshots", "storage", "tenant", "users"]
+
+"MiqAeServiceWindowsImage": ["customization_templates", "pxe_server"]

@@ -1,0 +1,46 @@
+#
+# Nice general purpose
+#
+{'MiqAeServiceServiceTemplateProvisionTask': ['source', 'destination', 'miq_request', 'miq_request_tasks', 'service_resource'],
+'MiqAeServiceServiceTemplateProvisionRequest': ['miq_request', 'miq_request_tasks', 'requester', 'resource', 'source'],
+'MiqAeServiceServiceTemplate': ['service_resources'],
+'MiqAeServiceServiceResource': ['resource', 'service_template'],
+'MiqAeServiceMiqProvisionRequest': ['miq_request', 'miq_request_tasks', 'miq_provisions', 'requester', 'resource', 'source', 'vm_template'],
+'MiqAeServiceMiqProvisionRequestTemplate': ['miq_request', 'miq_request_tasks'],
+'MiqAeServiceManageIQ_Providers_Vmware_InfraManager_Provision': ['source', 'destination', 'miq_provision_request', 'miq_request', 'miq_request_task', 'vm', 'vm_template'],
+'MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Provision': ['ALL'],
+'MiqAeServiceManageIQ_Providers_Redhat_InfraManager_ProvisionViaPxe': ['ALL'],
+'MiqAeServiceManageIQ_Providers_Vmware_InfraManager_Vm': ['ems_cluster', 'ems_folder', 'resource_pool', 'ext_management_system', 'storage', 'service', 'hardware', 'operating_system'],
+'MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Vm': ['ems_cluster', 'ems_folder', 'resource_pool', 'ext_management_system', 'storage', 'service', 'hardware'],
+'MiqAeServiceHardware': ['nics', 'guest_devices', 'ports', 'vm' ],
+'MiqAeServiceUser': ['current_group'],
+'MiqAeServiceGuestDevice': ['hardware', 'lan', 'network']}
+
+#
+# Whitelist for dumping VM details from a button
+#
+{ 'MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Vm': ['hardware', 'host', 'storage'],
+'MiqAeServiceManageIQ_Providers_Vmware_InfraManager_Vm': ['hardware', 'host', 'storage'],
+'MiqAeServiceHardware': ['nics', 'guest_devices', 'ports', 'storage_adapters' ],
+'MiqAeServiceGuestDevice': ['hardware', 'lan', 'network'] }
+
+#
+# Whitelist for dumping automation requests and tasks
+#
+{ 'MiqAeServiceAutomationTask': ['automation_request'] }
+#
+# Whitelist for dumping provisioning requests and tasks (e.g. call from the Infrastructure VM Provisioning State Machine)
+#
+{ 'MiqAeServiceMiqProvisionRequest': ['miq_request', 'miq_request_tasks', 'miq_provisions', 'requester', 'resource', 'source', 'vm_template'],
+'MiqAeServiceMiqProvisionRequestTemplate': ['ALL'],
+'MiqAeServiceManageIQ_Providers_Vmware_InfraManager_Provision': ['ALL'],
+'MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Provision': ['ALL'],
+'MiqAeServiceUser': ['current_group'] }
+#
+# Whitelist for dumping service requests (e.g. call from the Service Provision State Machone)
+#
+{ 'MiqAeServiceServiceTemplateProvisionTask': ['source', 'destination', 'miq_request', 'miq_request_tasks', 'service_resource'],
+'MiqAeServiceServiceTemplateProvisionRequest': ['miq_request', 'miq_request_tasks', 'requester', 'resource', 'source'],
+'MiqAeServiceServiceTemplate': ['service_resources'],
+'MiqAeServiceServiceResource': ['resource', 'service_template'] }
+

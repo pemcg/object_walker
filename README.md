@@ -1,109 +1,143 @@
-## object_walker
+# object_walker
 
 One of the challenges when starting out writing CloudForms or ManageIQ automation scripts, is knowing where the objects and attributes are under $evm.root that we may need to access. For example, depending on the automation action, we may have an $evm.root['vm'] object, or we may not.
 
-This script is an attempt to demystify the object structure that is available at any point in the Automation engine.
+This script is an attempt to demystify the object structure that is available at any point in the Automation Engine.
 
-Calling the script from any point will walk the object hierarchy from $evm.root downwards, printing objects and attributes
+Calling the script from any point will walk the object hierarchy from `$evm.root` downwards, printing objects and attributes
 as it goes, i.e.
 
 
 ```
-Object Walker 1.6 Starting
+Object Walker 1.8 Starting
+     --- walk_association_policy details ---
+     walk_association_policy = whitelist
+     walk_association_whitelist = { 'MiqAeServiceMiqProvisionRequest': ['miq_request','miq_request_tasks','miq_provisions','requester','resource','source','vm_template'], 'MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Provision': ['source','destination','miq_provision_request','miq_request','miq_request_task','vm','vm_template','tenant'], 'MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Vm': ['ems_cluster','ems_folder','resource_pool','service','ext_management_system','storage','hardware','operating_system'], 'MiqAeServiceHardware': ['nics','guest_devices','ports','vm'], 'MiqAeServiceUser': ['current_group'], 'MiqAeServiceGuestDevice': ['hardware','lan','network'] }
      --- $evm.current_* details ---
-     $evm.current_namespace = Bit63/Bit63   (type: String)
-     $evm.current_class = Methods   (type: String)
-     $evm.current_instance = ObjectWalker   (type: String)
-     $evm.current_message = create   (type: String)
-     $evm.current_object = /Bit63/Bit63/Methods/ObjectWalker   (type: DRb::DRbObject, URI: druby://127.0.0.1:36722)
-     $evm.current_object.current_field_name = Execute   (type: String)
-     $evm.current_object.current_field_type = method   (type: String)
+     $evm.current_namespace = Bit63/Stuff   (type: String)
+     $evm.current_class = ObjectWalker   (type: String)
+     $evm.current_instance = object_walker   (type: String)
      $evm.current_method = object_walker   (type: String)
-     --- object hierarchy ---
-     $evm.root = /ManageIQ/SYSTEM/PROCESS/Request
-       $evm.root child = /ManageIQ/System/Request/call_instance
-         $evm.parent = /bit63/bit63/methods/test
-           $evm.object = /Bit63/Bit63/Methods/ObjectWalker
+     $evm.current_message = create   (type: String)
+     $evm.current_object = /Bit63/Stuff/ObjectWalker/object_walker   (type: DRb::DRbObject, URI: druby://127.0.0.1:33776)
+     $evm.current_object.current_field_name = execute   (type: String)
+     $evm.current_object.current_field_type = method   (type: String)
+     --- automation instance hierarchy ---
+     /ManageIQ/System/Process/AUTOMATION  ($evm.root)
+     |    /ManageIQ/infrastructure/VM/Lifecycle/Provisioning
+     |    |    /ManageIQ/Infrastructure/VM/Provisioning/Profile/EvmGroup-super_administrator
+     |    |    /Bit63/Infrastructure/VM/Provisioning/StateMachines/VMProvision_vm/template  ($evm.parent)
+     |    |    |    /ManageIQ/Infrastructure/VM/Provisioning/StateMachines/Methods/CustomizeRequest
+     |    |    |    /ManageIQ/Infrastructure/VM/Provisioning/Placement/default
+     |    |    |    /Bit63/Stuff/ObjectWalker/object_walker  ($evm.object)
      --- walking $evm.root ---
-     $evm.root = /ManageIQ/SYSTEM/PROCESS/Request   (type: DRb::DRbObject, URI: druby://127.0.0.1:36722)
+     $evm.root = /ManageIQ/System/Process/AUTOMATION   (type: DRb::DRbObject, URI: druby://127.0.0.1:33776)
      |    --- attributes follow ---
-     |    $evm.root['ae_provider_category'] = unknown   (type: String)
-     |    $evm.root.class = DRb::DRbObject   (type: Class)
-     |    $evm.root['ext_management_system'] => vCenter   (type: DRb::DRbObject, URI: druby://127.0.0.1:36722)
+     |    $evm.root['ae_next_state'] =    (type: String)
+     |    $evm.root['ae_provider_category'] = infrastructure   (type: String)
+     |    $evm.root['ae_result'] = ok   (type: String)
+     |    $evm.root['ae_state'] = WalkObjects   (type: String)
+     |    $evm.root['ae_state_retries'] = 0   (type: Fixnum)
+     |    $evm.root['ae_state_started'] = 2016-08-01 09:55:59 UTC   (type: String)
+     |    $evm.root['ae_state_step'] = main   (type: String)
+     |    $evm.root['ae_status_state'] = on_exit   (type: String)
+     |    $evm.root['miq_group'] => #<MiqAeMethodService::MiqAeServiceMiqGroup:0x0000000c6728c8>   (type: DRb::DRbObject, URI: druby://127.0.0.1:33776)
      |    |    --- attributes follow ---
-     |    |    $evm.root['ext_management_system'].api_version = 4.1   (type: String)
-     |    |    $evm.root['ext_management_system'].created_on = 2015-09-23 13:21:18 UTC   (type: ActiveSupport::TimeWithZone)
-     |    |    $evm.root['ext_management_system'].guid = f974734e-61f5-11e5-94a1-005056b87ba6   (type: String)
-...
-     |    |    $evm.root['ext_management_system'].type = EmsVmware   (type: String)
-     |    |    $evm.root['ext_management_system'].uid_ems = AB9F17D7-6604-4322-A537-583E23224331   (type: String)
-     |    |    $evm.root['ext_management_system'].updated_on = 2015-10-06 14:59:09 UTC   (type: ActiveSupport::TimeWithZone)
-     |    |    $evm.root['ext_management_system'].zone_id = 1000000000001   (type: Fixnum)
+     |    |    $evm.root['miq_group'].created_on = 2016-05-25 08:09:35 UTC   (type: ActiveSupport::TimeWithZone)
+     |    |    $evm.root['miq_group'].description = EvmGroup-super_administrator   (type: String)
+     |    |    $evm.root['miq_group'].filters = nil
+     |    |    $evm.root['miq_group'].group_type = system   (type: String)
+     |    |    $evm.root['miq_group'].id = 2   (type: Fixnum)
+     |    |    $evm.root['miq_group'].sequence = 1   (type: Fixnum)
+     |    |    $evm.root['miq_group'].settings = nil
+     |    |    $evm.root['miq_group'].tenant_id = 1   (type: Fixnum)
+     |    |    $evm.root['miq_group'].updated_on = 2016-05-25 08:09:35 UTC   (type: ActiveSupport::TimeWithZone)
      |    |    --- end of attributes ---
      |    |    --- virtual columns follow ---
-     |    |    $evm.root['ext_management_system'].aggregate_cpu_speed = 6628   (type: Fixnum)
-     |    |    $evm.root['ext_management_system'].aggregate_logical_cpus = 2   (type: Fixnum)
-     |    |    $evm.root['ext_management_system'].aggregate_memory = 16252   (type: Fixnum)
-     |    |    $evm.root['ext_management_system'].aggregate_physical_cpus = 1   (type: Fixnum)
-     |    |    $evm.root['ext_management_system'].aggregate_vm_cpus = 21   (type: Fixnum)
-     |    |    $evm.root['ext_management_system'].aggregate_vm_memory = 37888   (type: Fixnum)
+     |    |    $evm.root['miq_group'].allocated_memory = 1073741824   (type: Fixnum)
+     |    |    $evm.root['miq_group'].allocated_storage = 42949672960   (type: Fixnum)
+     |    |    $evm.root['miq_group'].allocated_vcpu = 1   (type: Fixnum)
 ```
-  etc
+  etc.
 
-Many of the objects that we can walk through are in fact Rails Active Record Associations (object representations of database
-records), and we often don't want to print all of them. The script has a variable @walk\_association\_policy, that should have
-the value of either :whitelist or :blacklist.
-
-if @walk\_association\_policy = :whitelist, then object\_walker will only traverse associations of objects that are explicitly
-mentioned in the @walk\_association\_whitelist hash. This enables us to carefully control what is dumped. If object\_walker finds
-an association that isn't in the hash, it will print a line similar to:
-
-```
-$evm.root['vm'].datacenter (type: Association, objects found)
-   (datacenter isn't in the @walk_associations hash for MiqAeServiceVmRedhat...)
-```
-
-If you wish to explore and dump this associaiton, edit the hash to add the association name to the list associated with the
-object type. The symbol :ALL can be used to walk all associations of an object type
-
-```ruby
-@walk_association_whitelist = { "MiqAeServiceServiceTemplateProvisionTask" => ["source", "destination", "miq_request"],
-                                "MiqAeServiceServiceTemplate" => ["service_resources"],
-                                "MiqAeServiceServiceResource" => ["resource", "service_template"],
-                                "MiqAeServiceMiqProvisionRequest" => ["miq_request", "miq_request_tasks"],
-                                "MiqAeServiceMiqProvisionRequestTemplate" => ["miq_request", "miq_request_tasks"],
-                                "MiqAeServiceMiqProvisionVmware" => ["source", "destination", "miq_provision_request"],
-                                "MiqAeServiceMiqProvisionRedhatViaPxe" => [:ALL],
-                                "MiqAeServiceVmVmware" => ["ems_cluster", "storage", "service", "hardware"],
-                                "MiqAeServiceVmRedhat" => ["ems_cluster", "storage", "service", "hardware"],
-                                "MiqAeServiceHardware" => ["nics"]}
-```
-
-if @walk\_association\_policy = :blacklist, then object\_walker will traverse all associations of all objects, _except_ those that
-are explicitly mentioned in the @walk\_association\_blacklist hash. This enables us to run a more exploratory dump, at the
-cost of a **much** more verbose output. The symbol:ALL can be used to prevent the walking any associations of an object type
-
-```ruby
-@walk_association_blacklist = { 'MiqAeServiceEmsRedhat' => ['ems_events'],
-                                'MiqAeServiceEmsVmware' => ['ems_events'],
-                                'MiqAeServiceEmsCluster' => ['all_vms', 'vms', 'ems_events'],
-                                'MiqAeServiceHostRedhat' => ['guest_applications', 'ems_events'],
-                                'MiqAeServiceHostVmwareEsx' => ['guest_applications', 'ems_events']}
-```
-The more usual method of running is in :whitelist mode, but this often requires frequent editing of the @walk\_association\_whitelist as new associations are being explored.
-
-To avoid having to edit the source in such circumstances, a service dialog can be created containing a text area box element named _walk\_association\_whitelist_. Any valid whitelist hash entered into this dialog field will be used as a run-time override of the static @walk\_association\_whitelist defined in the code. The ObjectWalker instance can then be called from a button, configured to display the dialog.
-
-![Screenshot 07](images/screenshot07.jpg)
 
 Several of the objects in the Automate model have circular references to themselves either directly or indirectly through
-other associations. To prevent the same object being dumped multiple times the script records where it's been, and prints:
+other associations. To prevent the same object being printed multiple times the script records where it's been, and prints:
 
 ```
-object_walker:   Object MiqAeServiceServiceTemplate with ID 1000000000003 has already been dumped...
+    |    (object type: MiqAeServiceManageIQ_Providers_Openstack_CloudManager_Vm, object ID: 23)
+    |    |    Object MiqAeServiceManageIQ_Providers_Openstack_CloudManager_Vm with ID 23 has already been printed...
 ```
 
-Many attributes that get dumped have a value of 'nil', i.e.
+## Walk Association Policy
+
+Many of the objects that we can walk through are in fact Rails Active Record Associations (object representations of database
+records), and we often don't want to print all of them. The script uses a `walk_association_policy`, variable to help decide which associations to traverse; it should have the value of either "whitelist" or "blacklist". This variable defaults to "whitelist" unless overridden by an instance schema attribute called _walk\_association\_policy_ (read as `$evm.object['walk_association_policy']`).
+
+### Whitelist
+
+if `walk_association_policy` = _whitelist_, then object\_walker will only traverse associations of objects that are explicitly
+mentioned in the `walk_association_whitelist` JSON-like hash (either defined in the instance schema, or in a service dialog). The string "ALL" can be used to walk all associations of an object type. A typical whitelist hash is as follows:
+
+```
+{"MiqAeServiceServiceTemplateProvisionTask":["source","destination","miq_request"],
+"MiqAeServiceServiceTemplateProvisionRequest":["miq_request","miq_request_tasks","requester","source"],
+"MiqAeServiceServiceTemplate":["service_resources"],
+"MiqAeServiceServiceResource":["resource","service_template"],
+"MiqAeServiceMiqProvisionRequest":["miq_request","miq_request_tasks","miq_provisions"],
+"MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Provision":["ALL"],
+"MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Vm":["ems_cluster","ems_folder","resource_pool"],
+"MiqAeServiceManageIQ_Providers_Openstack_CloudManager_Vm":["key_pairs","security_groups","tenant","flavor"],
+"MiqAeServiceHardware":["ALL"],
+"MiqAeServiceUser":["current_group"],
+"MiqAeServiceGuestDevice":["hardware","lan","network"]}
+```
+
+The hash enables us to carefully control what is traversed and printed. If object\_walker finds an association that isn't in the hash, it will print a line similar to:
+
+```
+$evm.root['user'].current_tenant (type: Association)
+*** not walking: 'current_tenant' isn't in the walk_association_whitelist hash for MiqAeServiceUser ***
+```
+
+If we decide to explore and dump this _current\_tenant_ association, we edit the hash to add its name to the list associated with the
+object type. In the example whitelist hash above, we would add to the list defined by the _MiqAeServiceUser_ key, for example:
+
+```
+"MiqAeServiceUser":["current_group", "current_tenant"],
+```
+
+### Blacklist
+
+if `walk_association_policy` = _blacklist_, then object\_walker will traverse all associations of all objects, _except_ those that
+are explicitly mentioned in the `walk_association_blacklist` hash. This enables us to run a more exploratory dump, at the
+cost of a **much** more verbose output. The format of the blacklist is the same as the whitelist, and the string "ALL" can be used to avoid walking _any_ associations of an object type.
+
+---
+
+**Note:** the _object\_associations_ file in the repository lists all associations of all MiqAeService objects, and can be used as a reference. The _sample\_whitelists_ file contains examples of typical whitelists that could be used for various investigations.
+
+---
+
+### Defining the Hashes in the Instance Schema
+
+The _walk\_association\_whitelist_ and _walk\_association\_blacklist_ hash definitions are JSON-like hashes, but either single or double quotes can be used, and the quotes don't need to be escaped by backslashes. We define the _walk\_association\_policy_, _walk\_association\_whitelist_ and _walk\_association\_blacklist_ as attributes of data type _String_ in the class and instance schema.
+
+The following sceenshot is an example of typical schema attribute definitions:
+
+![Screenshot 01](images/screenshot01.jpg)
+
+### Defining the Hashes in a Service Dialog
+
+When exploring the object model, we frequently update the walk\_association\_whitelist or walk\_association\_blacklist schema attributes as new associations are being explored.
+
+To avoid having to edit the instance attributes in such circumstances, a service dialog can be created containing a text area box element named _walk\_association\_whitelist_ or _walk\_association\_blacklist_. Any valid JSON-like whitelist hash entered into this dialog field will be used as a run-time override of the walk\_association\_whitelist or walk\_association\_blacklist defined in the instance schema. The object\_walker instance can then be called from a button, configured to display the dialog.
+
+![Screenshot 07](images/screenshot02.jpg)
+
+### Removing nil Values
+
+Many attributes that get printed have a value of 'nil', i.e.
 
 ```
      |    |    $evm.root['user'].userid = admin   (type: String)
@@ -126,60 +160,49 @@ Many attributes that get dumped have a value of 'nil', i.e.
 ```
 
 Sometimes we want to know that the attribute is present, even if its value is nil, but at other times we only wish to know
-about attributes with valid values (this also gives us a more concise dump output). In this case we can define the script
-variable:
+about attributes with valid values (this also gives us a more concise dump output). In this case we can define an optional instance attribute of data type _Boolean_, called `print_nil_values`, and give it a value of _false_, as follows:
 
-```ruby
-@print_nil_values = false
-```
+![Screenshot 07](images/screenshot03.jpg)
 
-and the resulting output dump will leave out any keys or attributes that have nil values.
+The resulting output dump will leave out any keys or attributes that have nil values.
 
-### Installation
+## Installation
 
-Under your own domain, create a new namespace, and a class to execute a single instance.
-
-![Screenshot 01](images/screenshot01.jpg)
-
-Here I created an instance called ObjectWalker, and a method called object_walker containing the code.
-
-### Calling object\_walker
-
-We get an object\_walker dump by simply calling the new ObjectWalker instance from anywhere in the automation namespace, e.g.
-from a state in the VM Provision State Machine:
-
-![Screenshot 02](images/screenshot02.jpg)
-
-... or from a button on a VM:
-
-![Screenshot 03](images/screenshot03.jpg)
-
-... or even in-line from some other automation code:
-
-```
-$evm.instantiate('/Discovery/Methods/ObjectWalker')
-```
-
-### Customising the output
-
-The default @walk\_association\_whitelist dumps quite a lot of information, and it can be useful to tailor this for the particular
-type of dump that we are interested in. We can modify our ObjectWalker class to call one of several object\_walker methods, each with
-a different @walk\_association\_whitelist, selected using a message when calling the instance. See sample\_whitelists.rb for some examples.
+In a suitable namespace, create an _ObjectWalker_ class, and an instance and method each of name _object\_walker_, as follows:
 
 ![Screenshot 04](images/screenshot04.jpg)
 
+Edit the schema of the _ObjectWalker_ class to add the attributes and an _execute_ field to run the method, as follows:
+
 ![Screenshot 05](images/screenshot05.jpg)
 
-Now we can call the appropriate copy of object\_walker with our customised @walk\_association\_whitelist, for example to compare the
-service provision data structures before and after calling CatalogItemInitialization:
+Now edit the instance schema to add suitable attribute values, as follows:
 
 ![Screenshot 06](images/screenshot06.jpg)
 
-(we can use object\_walker\_reader --diff to compare the outputs - see below)
+## Calling object\_walker
+
+We get an object\_walker dump by simply calling the _object\_walker_ instance from anywhere in the automation namespace. For example if we wish to examine the $evm.root object structure part-way through a VM provisioning workflow, we could add a call to object_walker from a state in the VM Provision State Machine, as follows:
+
+![Screenshot 07](images/screenshot07.jpg)
+
+If we simply wished to examine the object structure related to a VM object, we could call object_walker from a button on a VM in the WebUI, as follows:
+
+![Screenshot 08](images/screenshot08.jpg)
+
+We can even call object_walker in-line from another automation method, using `$evm.instantiate`, as follows:
+
+```
+$evm.instantiate('/Discovery/ObjectWalker/object_walker')
+```
+
+## Reading the Output
+
+Although we could inspect the lines printed by object_walker by following _automation.log_, the preferred way to read the output is to copy _object\_walker\_reader.rb_ from the repository to the CloudForms/ManageIQ appliance. This formats the output, and gives us several options for selecting various object_walker dumps.
 
 ### object\_walker\_reader
 
-Use object\_walker\_reader to extract the latest (no arguments), or a selected object_walker dump from automation.log or other
+Use object\_walker\_reader to extract the latest (no arguments), or a selected object_walker dump from _automation.log_ or other
 renamed or saved log file.
 
 ```
@@ -193,7 +216,7 @@ Usage: object_walker_reader.rb [options]
 
 #### Examples:
 
-##### Listing object\_walker dumps
+##### Listing object\_walker dumps using the '-l' switch
 
 ```
  ./object_walker_reader.rb -l
@@ -205,7 +228,7 @@ Usage: object_walker_reader.rb [options]
  ...
 ```
 
-##### Listing dumps in a non-default (i.e. copied from another system) log file
+##### Listing dumps in a non-default (i.e. copied from another system) log file using the '-f' switch
 
 ```
  ./object_walker_reader.rb -l -f /Documents/CloudForms/cf30-automation-log
@@ -216,33 +239,35 @@ Usage: object_walker_reader.rb [options]
  ...
 ```
 
-##### Dumping a particular object\_walker output by timestamp
-
+##### Dumping a particular object\_walker output by timestamp using the '-t' switch
 
 ```
-[root@cloudforms05 vmdb]# ~/object_walker_reader.rb -t 2015-10-06T15:53:43.538483
-Object Walker 1.6 Starting
+~/object_walker_reader.rb -t 2016-08-02T09:17:06.722068
+Object Walker 1.8 Starting
+     *** detected 'print_nil_values = false' so attributes with nil values will not be printed ***
+     --- walk_association_policy details ---
+     walk_association_policy = whitelist
+     walk_association_whitelist = {"MiqAeServiceUser": ["current_group", "current_tenant"]}
      --- $evm.current_* details ---
-     $evm.current_namespace = bit63/bit63   (type: String)
-     $evm.current_class = methods   (type: String)
-     $evm.current_instance = objectwalker   (type: String)
-     $evm.current_message = create   (type: String)
-     $evm.current_object = /bit63/bit63/methods/objectwalker   (type: DRb::DRbObject, URI: druby://127.0.0.1:47046)
-     $evm.current_object.current_field_name = Execute   (type: String)
-     $evm.current_object.current_field_type = method   (type: String)
+     $evm.current_namespace = Bit63/stuff   (type: String)
+     $evm.current_class = objectwalker   (type: String)
+     $evm.current_instance = object_walker   (type: String)
      $evm.current_method = object_walker   (type: String)
-     --- object hierarchy ---
-     $evm.root = /bit63/bit63/methods/objectwalker
+     $evm.current_message = create   (type: String)
+     $evm.current_object = /Bit63/stuff/objectwalker/object_walker   (type: DRb::DRbObject, URI: druby://127.0.0.1:45024)
+     $evm.current_object.current_field_name = execute   (type: String)
+     $evm.current_object.current_field_type = method   (type: String)
+     --- automation instance hierarchy ---
+     /ManageIQ/SYSTEM/PROCESS/Request  ($evm.root)
+     |    /ManageIQ/System/Request/call_instance  ($evm.parent)
+     |    |    /Bit63/stuff/objectwalker/object_walker  ($evm.object)
      --- walking $evm.root ---
-     $evm.root = /bit63/bit63/methods/objectwalker   (type: DRb::DRbObject, URI: druby://127.0.0.1:47046)
+     $evm.root = /ManageIQ/SYSTEM/PROCESS/Request   (type: DRb::DRbObject, URI: druby://127.0.0.1:45024)
      |    --- attributes follow ---
-     |    $evm.root['automation_task'] => #<MiqAeMethodService::MiqAeServiceAutomationTask:0x0000000dbce370>   (type: DRb::DRbObject, URI: druby://127.0.0.1:47046)
-     |    |    --- attributes follow ---
-     |    |    $evm.root['automation_task'].created_on = 2015-10-06 14:53:41 UTC   (type: ActiveSupport::TimeWithZone)
-     |    |    $evm.root['automation_task'].description = Automation Task   (type: String)
+     |    $evm.root['ae_provider_category'] = infrastructure   (type: String)
 ```
 
-##### Comparing the output from two object\_walker dumps
+##### Comparing the output from two object\_walker dumps using the '-d' switch
 
 ```
  ./object_walker_reader.rb -d 2015-05-11T14:41:58.031661,2015-05-11T14:42:08.186930
@@ -265,4 +290,4 @@ Object Walker 1.6 Starting
  >      object_walker:   $evm.root['ae_state_started'] = 2015-05-11 14:42:07 UTC   (type: String)
   ...
 ```
-To use, simple copy the object\_walker\_reader.rb file to the CloudForms appliance (for example to /root), and run.
+
