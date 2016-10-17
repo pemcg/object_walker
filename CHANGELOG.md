@@ -1,19 +1,23 @@
 # Change Log
 
+## 1.9 (14-Oct-2016)
+Various bugfixes. Only call print\_tags if ServiceModelBase supports the taggable? method (CFME 5.6.2/Darga-4 and later).
+Changed instance variables to be global variables (what was I thinking originally?)
+
 ## 1.8 (21-Jul-2016)
 Added support for reading variables from the model, and took the black/whitelists out of the in-line code. Added print\_tags and print\_custom\_attributes.
 
-## 1.7.1 (25-Apr-2016)
+## 1.7-1 (25-Apr-2016)
 Added more of the base methods to the methods listing of objects
 
 ## 1.7 (08-Dec-2015)
 Re-work indentation. We now indicate indentation level as a numeric value, and let the reader insert the actual indent space string.
 Also add some of the new CFME 5.5 format objects to the whitelist
 
-## 1.6.2 (30-Oct-2015)
+## 1.6-2 (30-Oct-2015)
 Re-wrote walk\_object\_hierarchy to include walk\_object\_hierarchy. Now walks (correctly) the entire structure.
 
-## 1.6.1 (19-Oct-2015)
+## 1.6-1 (19-Oct-2015)
 Reformatted the walk\_association white/blacklists for appearance
 
 ## 1.6 (06-Oct-2015)

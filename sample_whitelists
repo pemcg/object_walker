@@ -44,3 +44,4 @@
 'MiqAeServiceServiceTemplate': ['service_resources'],
 'MiqAeServiceServiceResource': ['resource', 'service_template'] }
 
+{"MiqAeServiceManageIQ_Providers_Vmware_InfraManager_HostEsx": ["datacenter", "directories", "ems_cluster", "ems_folder", "files", "hardware", "lans", "operating_system", "storages", "switches", "vms"]}

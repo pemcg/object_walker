@@ -168,6 +168,14 @@ The resulting output dump will leave out any keys or attributes that have nil va
 
 ## Installation
 
+There are two ways of installing object\_walker.
+
+### The Easy Way
+
+Copy the investigative_debugging.zip datastore export to your local system, and import it from the *Automate -> Import / Export* menu. This will import a domain called `Investigative_Debugging` containing the `Discovery` namespace, and its class, instance and method. The class schema contains a sample general-purpose whitelist.
+
+### The Manual Way
+
 In a suitable namespace, create an _ObjectWalker_ class, and an instance and method each of name _object\_walker_, as follows:
 
 ![Screenshot 04](images/screenshot04.jpg)
