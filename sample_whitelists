@@ -47,4 +47,29 @@
 'MiqAeServiceServiceTemplate': ['service_resources'],
 'MiqAeServiceServiceResource': ['resource', 'service_template'] }
 
-{"MiqAeServiceManageIQ_Providers_Vmware_InfraManager_HostEsx": ["datacenter", "directories", "ems_cluster", "ems_folder", "files", "hardware", "lans", "operating_system", "storages", "switches", "vms"]}
+#
+# Sample blacklist
+#
+{
+'MiqAeServiceManageIQ_Providers_Amazon_CloudManager': ['ems_events'],
+'MiqAeServiceManageIQ_Providers_Azure_CloudManager': ['ems_events'],
+'MiqAeServiceManageIQ_Providers_Google_CloudManager': ['ems_events'],
+'MiqAeServiceManageIQ_Providers_Openstack_CloudManager': ['ems_events'],
+'MiqAeServiceManageIQ_Providers_Vmware_InfraManager': ['ems_events'],
+'MiqAeServiceManageIQ_Providers_Redhat_InfraManager': ['ems_events'],
+'MiqAeServiceManageIQ_Providers_Openstack_InfraManager': ['ems_events'],
+'MiqAeServiceManageIQ_Providers_Microsoft_InfraManager': ['ems_events'],
+'MiqAeServiceManageIQ_Providers_Foreman_ConfigurationManager': ['ems_events'],
+'MiqAeServiceManageIQ_Providers_AnsibleTower_ConfigurationManager': ['ems_events'],
+'MiqAeServiceEmsVmware': ['ems_events'],
+'MiqAeServiceEmsRedhat': ['ems_events'],
+'MiqAeServiceEmsCluster': ['all_vms', 'vms', 'ems_events'],
+'MiqAeServiceManageIQ_Providers_Amazon_CloudManager_Vm': ['guest_applications', 'ems_events'],
+'MiqAeServiceManageIQ_Providers_Vmware_InfraManager_Vm': ['guest_applications', 'ems_events'],
+'MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Vm': ['guest_applications', 'ems_events'],
+'MiqAeServiceManageIQ_Providers_Azure_CloudManager_Vm': ['guest_applications', 'ems_events'],
+'MiqAeServiceManageIQ_Providers_Google_CloudManager_Vm': ['guest_applications', 'ems_events'],
+'MiqAeServiceManageIQ_Providers_Openstack_CloudManager_Vm': ['guest_applications', 'ems_events'],
+'MiqAeServiceManageIQ_Providers_Redhat_InfraManager_Host': ['guest_applications', 'ems_events'],
+'MiqAeServiceManageIQ_Providers_Vmware_InfraManager_Host': ['guest_applications', 'ems_events']
+}
