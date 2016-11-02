@@ -11,7 +11,7 @@ require 'active_support/core_ext/string'
 require 'securerandom'
 require 'json'
 
-VERSION             = "1.9"
+VERSION             = "1.9.1"
 MAX_RECURSION_LEVEL = 7
 $debug              = false
 $print_methods      = true
@@ -125,7 +125,7 @@ def ping_attr(this_object, attribute)
     #
     # See if it's an attribute that we access using '.attribute'
     #
-    value = this_object.send(attribute)
+    value = this_object.method_missing(:send, attribute)
     format_string = ".#{attribute}"
   rescue NoMethodError
     #
@@ -281,7 +281,7 @@ def print_virtual_columns(object_string, this_object, this_object_class)
           print_line($recursion_level, "--- virtual columns follow ---")
           virtual_column_names.sort.each do |virtual_column_name|
             begin
-              virtual_column_value = this_object.send(virtual_column_name)
+              virtual_column_value = this_object.method_missing(:send, virtual_column_name)
               if virtual_column_value.nil?
                 print_line($recursion_level,
                           "#{object_string}.#{virtual_column_name} = nil") if $print_nil_values
@@ -407,7 +407,7 @@ def print_associations(object_string, this_object, this_object_class)
           end
           associations.uniq.sort.each do |association|
             begin
-              associated_objects = Array.wrap(this_object.send(association))
+              associated_objects = Array.wrap(this_object.method_missing(:send, association))
               if associated_objects.length == 0
                 print_line($recursion_level,
                           "#{object_string}.#{association} (type: Association (empty))")
