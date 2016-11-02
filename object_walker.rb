@@ -86,7 +86,7 @@ def print_line(indent_level, string)
   $evm.log("info", "#{$method}:[#{indent_level.to_s}] #{string}")
 end
 
-# End of print_linedumps
+# End of print_line
 
 #-------------------------------------------------------------------------------------------------------------
 # Method:       type
