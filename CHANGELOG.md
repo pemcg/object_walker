@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.9.1 (08-Nov-2016)
+Bugfix to work with ManageIQ Euwe/CFME 5.7
+
 ## 1.9 (14-Oct-2016)
 Various bugfixes. Only call print\_tags if ServiceModelBase supports the taggable? method (CFME 5.6.2/Darga-4 and later).
 Changed instance variables to be global variables (what was I thinking originally?)
