@@ -317,7 +317,7 @@
 
 'MiqAeServiceManageIQ_Providers_Vmware_InfraManager': ['customization_specs', 'ems_clusters', 'ems_events', 'ems_folders', 'hosts', 'miq_templates', 'provider', 'resource_pools', 'storages', 'tenant', 'vms']
 
-'MiqAeServiceManageIQ_Providers_Vmware_InfraManager_Host': ['datacenter', 'directories', 'ems_cluster', 'ems_events', 'ems_folder', 'ext_management_system', 'files', 'guest_applications', 'hardware', 'lans', 'operating_system', 'storages', 'switches', 'vms']
+'MiqAeServiceManageIQ_Providers_Vmware_InfraManager_Host': ['datacenter', 'directories', 'ems_MiqAeServiceEms', 'ems_events', 'ems_folder', 'ext_management_system', 'files', 'guest_applications', 'hardware', 'lans', 'operating_system', 'storages', 'switches', 'vms']
 
 'MiqAeServiceManageIQ_Providers_Vmware_InfraManager_HostEsx': ['datacenter', 'directories', 'ems_cluster', 'ems_events', 'ems_folder', 'ext_management_system', 'files', 'guest_applications', 'hardware', 'lans', 'operating_system', 'storages', 'switches', 'vms']
 

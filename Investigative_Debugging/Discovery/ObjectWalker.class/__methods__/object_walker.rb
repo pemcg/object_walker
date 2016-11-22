@@ -11,12 +11,12 @@ require 'active_support/core_ext/string'
 require 'securerandom'
 require 'json'
 
-VERSION             = "1.9.1"
+VERSION             = "1.9.2"
 MAX_RECURSION_LEVEL = 7
 $debug              = false
 $print_methods      = true
 $print_evm_object   = false
-$print_evm_parent   = true
+$print_evm_parent   = false
 #
 #-------------------------------------------------------------------------------------------------------------
 # Method:       walk_automation_objects
