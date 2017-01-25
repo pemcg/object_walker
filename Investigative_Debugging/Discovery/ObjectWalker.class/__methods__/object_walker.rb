@@ -11,7 +11,7 @@ require 'active_support/core_ext/string'
 require 'securerandom'
 require 'json'
 
-VERSION             = "1.9.2"
+VERSION             = "1.9.3"
 MAX_RECURSION_LEVEL = 7
 $debug              = false
 $print_methods      = true
@@ -188,10 +188,19 @@ def print_attributes(object_string, this_object)
                   print_line($recursion_level,
                             "#{object_string}[\'#{attribute_name}\'] => #{attribute_value}   #{type(attribute_value)}")
                   walk_object("#{object_string}[\'#{attribute_name}\']", attribute_value)
+                elsif attribute_value.method_missing(:class).to_s == 'Array'
+                  attr_info = ping_attr(this_object, attribute_name)
+                  attribute_elements = []
+                  attribute_value.each do |attribute_element|
+                    attribute_elements << "#{attribute_element}"
+                  end
+                  print_line($recursion_level,
+                            "#{object_string}#{attr_info[:format_string]} = " \
+                            "#{attribute_elements}   (type: Array of Service Models)")
                 else
                   print_line($recursion_level,
-                            "Debug: not dumping, attribute_value.method_missing(:class) = " \
-                            "#{attribute_value.method_missing(:class)}") if $debug
+                            "*** unhandled attribute type: attribute_value.method_missing(:class) = " \
+                            "#{attribute_value.method_missing(:class)} ***") 
                 end
               else
                 begin

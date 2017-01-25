@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.9.3 (25-Jan-2017)
+Bugfix - attributes containing arrays of service models weren't displayed
+
+## 1.9.2 (22-Nov-2016)
+Changed default value of $print\_evm\_parent to false
+
 ## 1.9.1 (08-Nov-2016)
 Bugfix to work with ManageIQ Euwe/CFME 5.7
 
