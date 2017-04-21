@@ -56,14 +56,10 @@ end
 
 def print_automation_objects(indent_level, hierarchy)
   case hierarchy.position
-  when 'root'
-    print_line(indent_level, "#{hierarchy.obj_name}  ($evm.root)")
-  when 'parent'
-    print_line(indent_level, "#{hierarchy.obj_name}  ($evm.parent)")
-  when 'object'
-    print_line(indent_level, "#{hierarchy.obj_name}  ($evm.object)")
-  else
-    print_line(indent_level, "#{hierarchy.obj_name}")
+  when 'root' then print_line(indent_level, "#{hierarchy.obj_name}  ($evm.root)")
+  when 'parent' then print_line(indent_level, "#{hierarchy.obj_name}  ($evm.parent)")
+  when 'object' then print_line(indent_level, "#{hierarchy.obj_name}  ($evm.object)")
+  else print_line(indent_level, "#{hierarchy.obj_name}")
   end
   indent_level += 1
   hierarchy.children.each do |child|
