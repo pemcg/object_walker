@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.10 (21-Oct-2017)
+More intelligent handing of broken associations. Includes a corresponding update to object_walker_reader.rb
+
 ## 1.9.3 (25-Jan-2017)
 Bugfix - attributes containing arrays of service models weren't displayed
 
