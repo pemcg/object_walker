@@ -5,7 +5,7 @@
 #
 #Usage: object_walker_reader.rb [options]
 #    -l, --list                       list object_walker dumps in the file
-#    -f, --file filename              Full file path to automation.log (if not /var/www/miq/vmdb/log/automtion.log)
+#    -f, --file filename              Full file path to automation.log (if not /var/www/miq/vmdb/log/automation.log)
 #    -t, --timestamp timestamp        Date/time of the object_walker dump to be listed (hint: copy from -l output)
 #    -d, --diff timestamp1,timestamp2 Date/time of two object_walker dumps to be compared using 'diff'
 #    -h, --help                       Displays Help
@@ -54,12 +54,13 @@
 #                                       for each line. Strip the ID from 1.6 format object_walker dumps.
 #               1.4     02-Nov-2015     Print continuation lines where a value is multi-line
 #               1.7     08-Dec-2015     Bumping version to match object_walker 1.7. We now handle the indentation string here
+#               1.8     19-Oct-2017     Ignore stack traces in output
 #  
 
 require 'optparse'
 require 'tempfile'
 
-VERSION = "1.7"
+VERSION = "1.8"
 @debug = false
 
 valid_timestamp_re = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}/
@@ -167,10 +168,12 @@ def find_dump(file, timestamp=nil, tempfile=nil)
     match = @object_walker_body_re.match(line)
     if match
       if match[:continuation_line]
-        if tempfile.nil?
-          puts "#{indent_level_to_string(indent_level)}#{line}"
-        else
-          tempfile.write("#{indent_level_to_string(indent_level)}#{line}\n")
+        unless line =~ /^\/.*\d+:in .*$/  # ignore stack trace lines
+          if tempfile.nil?
+            puts "#{indent_level_to_string(indent_level)}#{line}"
+          else
+            tempfile.write("#{indent_level_to_string(indent_level)}#{line}\n")
+          end
         end
       elsif match[:id] == id
         if match[:indent_level]

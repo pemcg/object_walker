@@ -5,60 +5,60 @@ __domain__.yaml:
   method_files: 1
   method_instances: 1
   created_on: !ruby/object:ActiveSupport::TimeWithZone
-    utc: &1 2016-10-14 13:39:46.725442000 Z
+    utc: &1 2017-10-21 13:03:20.109335000 Z
     zone: &2 !ruby/object:ActiveSupport::TimeZone
       name: Etc/UTC
     time: *1
   updated_on: !ruby/object:ActiveSupport::TimeWithZone
-    utc: &3 2016-11-22 14:26:18.949988000 Z
+    utc: &3 2017-10-21 13:03:39.937195000 Z
     zone: *2
     time: *3
-  size: 199
-  sha1: SNSTn0zlXlVARWh9x+u0xvlBaho=
+  size: 224
+  sha1: rNhmIi+M8NR/7YRAilHUSWildvE=
 Investigative_Debugging/Discovery/__namespace__.yaml:
   created_on: !ruby/object:ActiveSupport::TimeWithZone
-    utc: &4 2016-10-14 13:40:07.826006000 Z
+    utc: &4 2017-10-21 13:03:20.655413000 Z
     zone: *2
     time: *4
   updated_on: !ruby/object:ActiveSupport::TimeWithZone
-    utc: &5 2016-10-14 13:40:07.826006000 Z
+    utc: &5 2017-10-21 13:03:20.655413000 Z
     zone: *2
     time: *5
-  size: 161
-  sha1: bKueA3Tphe0l2aSB41aWMstef4U=
+  size: 148
+  sha1: vAKxuorIM7oGD4b2j9UKMGsZNMg=
 Investigative_Debugging/Discovery/ObjectWalker.class/__class__.yaml:
   created_on: !ruby/object:ActiveSupport::TimeWithZone
-    utc: &6 2016-10-14 13:40:07.884981000 Z
+    utc: &6 2017-10-21 13:03:20.782894000 Z
     zone: *2
     time: *6
   updated_on: !ruby/object:ActiveSupport::TimeWithZone
-    utc: &7 2016-10-14 13:40:07.950571000 Z
+    utc: &7 2017-10-21 13:03:21.242558000 Z
     zone: *2
     time: *7
   size: 1722
   sha1: O2NCtyDNkQFYEtpJAfuNO01BRxg=
 Investigative_Debugging/Discovery/ObjectWalker.class/object_walker.yaml:
   created_on: !ruby/object:ActiveSupport::TimeWithZone
-    utc: &8 2016-10-14 13:40:07.998393000 Z
+    utc: &8 2017-10-21 13:03:21.466425000 Z
     zone: *2
     time: *8
   updated_on: !ruby/object:ActiveSupport::TimeWithZone
-    utc: &9 2016-12-05 09:56:23.959052000 Z
+    utc: &9 2017-10-21 13:10:53.901673000 Z
     zone: *2
     time: *9
-  size: 2276
-  sha1: N03Pe6fEEXObz8J9eS1jUTX+gn8=
+  size: 2432
+  sha1: CjAX/ZCm81apLHPJjNBk7PSeVs8=
 Investigative_Debugging/Discovery/ObjectWalker.class/__methods__/object_walker.rb:
   created_on: &12 !ruby/object:ActiveSupport::TimeWithZone
-    utc: &10 2016-10-14 13:40:16.317404000 Z
+    utc: &10 2017-10-21 13:03:21.690541000 Z
     zone: *2
     time: *10
   updated_on: &13 !ruby/object:ActiveSupport::TimeWithZone
-    utc: &11 2017-01-24 16:52:46.066296000 Z
+    utc: &11 2017-10-21 13:12:45.358180000 Z
     zone: *2
     time: *11
-  size: 40300
-  sha1: r9EzsaFjoE2VhaRNXfxhzgHfM4g=
+  size: 40699
+  sha1: w7KAMYMDGz9ZIsp2ow9am23DfoE=
 Investigative_Debugging/Discovery/ObjectWalker.class/__methods__/object_walker.yaml:
   created_on: *12
   updated_on: *13
@@ -66,33 +66,33 @@ Investigative_Debugging/Discovery/ObjectWalker.class/__methods__/object_walker.y
   sha1: PgWAT9znFEKlvJ+YdpzO+Xcq5UI=
 Investigative_Debugging/System/__namespace__.yaml:
   created_on: !ruby/object:ActiveSupport::TimeWithZone
-    utc: &14 2017-01-24 16:50:50.263962000 Z
+    utc: &14 2017-10-21 13:03:22.021098000 Z
     zone: *2
     time: *14
   updated_on: !ruby/object:ActiveSupport::TimeWithZone
-    utc: &15 2017-01-24 16:50:50.263962000 Z
+    utc: &15 2017-10-21 13:03:22.021098000 Z
     zone: *2
     time: *15
-  size: 158
-  sha1: zkGwbz6m10Hqlqwr3s7lki+Xe+E=
+  size: 145
+  sha1: rs4yeLg3wssLEk0drD1PflXqfCo=
 Investigative_Debugging/System/Request.class/__class__.yaml:
   created_on: !ruby/object:ActiveSupport::TimeWithZone
-    utc: &16 2017-01-24 16:50:50.329866000 Z
+    utc: &16 2017-10-21 13:03:22.170146000 Z
     zone: *2
     time: *16
   updated_on: !ruby/object:ActiveSupport::TimeWithZone
-    utc: &17 2017-01-24 16:50:50.452513000 Z
+    utc: &17 2017-10-21 13:03:22.176663000 Z
     zone: *2
     time: *17
   size: 7481
   sha1: UeYRmK6LXqIVwZlOXlv2h1sBjGE=
 Investigative_Debugging/System/Request.class/object_walker.yaml:
   created_on: !ruby/object:ActiveSupport::TimeWithZone
-    utc: &18 2017-01-24 16:51:37.456683000 Z
+    utc: &18 2017-10-21 13:03:22.409526000 Z
     zone: *2
     time: *18
   updated_on: !ruby/object:ActiveSupport::TimeWithZone
-    utc: &19 2017-01-24 16:51:37.509567000 Z
+    utc: &19 2017-10-21 13:03:22.415859000 Z
     zone: *2
     time: *19
   size: 210

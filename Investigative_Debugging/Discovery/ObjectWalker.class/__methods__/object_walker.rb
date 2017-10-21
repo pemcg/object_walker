@@ -11,7 +11,7 @@ require 'active_support/core_ext/string'
 require 'securerandom'
 require 'json'
 
-VERSION             = "1.9.3"
+VERSION             = "1.10"
 MAX_RECURSION_LEVEL = 7
 $debug              = false
 $print_methods      = true
@@ -299,10 +299,10 @@ def print_virtual_columns(object_string, this_object, this_object_class)
                           "#{object_string}.#{virtual_column_name} = " \
                           "#{virtual_column_value}   #{type(virtual_column_value)}")
               end
-            rescue NoMethodError
+            rescue => err
               print_line($recursion_level,
-                        "*** #{this_object_class} virtual column: \'#{virtual_column_name}\' " \
-                        "gives a NoMethodError when accessed (product bug?) ***")
+                        "!!! #{this_object_class} virtual column \'#{virtual_column_name}\' " \
+                        "throws a #{err.class} exception when accessed (product bug?) !!!")
             end
           end
           print_line($recursion_level, "--- end of virtual columns ---")
@@ -452,10 +452,10 @@ def print_associations(object_string, this_object, this_object_class)
                   exit MIQ_ABORT
                 end
               end
-            rescue NoMethodError
+            rescue => err
               print_line($recursion_level,
-                        "*** #{this_object_class} association: \'#{association}\', gives a " \
-                        "NoMethodError when accessed (product bug?) ***")
+                        "!!! #{this_object_class} association \'#{association}\' throws a " \
+                        "#{err.class} exception when accessed (product bug?) !!!")
               next
             end
           end
@@ -818,6 +818,16 @@ begin
   print_line(0, "$evm.current_object.current_field_type = #{$evm.current_object.current_field_type}   " \
                 "#{type($evm.current_object.current_field_type)}")
   #
+  # See if RBAC is enabled
+  #
+  if $evm.respond_to?(:rbac_enabled?)
+    if $evm.rbac_enabled?
+      print_line(0, "--- RBAC within automation is enabled ---")
+    else
+      print_line(0, "--- RBAC within automation is disabled ---")
+    end
+  end
+  #
   # and now print the object hierarchy...
   #
   print_line(0, "--- automation instance hierarchy ---")
@@ -825,6 +835,10 @@ begin
   # automation_object_hierarchy = Struct::ServiceObject.new(nil, nil, Array.new)
   automation_object_hierarchy = walk_automation_objects($evm.root)
   print_automation_objects(0, automation_object_hierarchy)
+  #
+  # Fire off a garbage collection to free up some space in the generic worker process
+  #
+  GC.start
   #
   # then walk and print $evm.root downwards...
   #
@@ -836,6 +850,7 @@ begin
   #
   unless $evm.parent.nil?
     if $print_evm_parent
+      GC.start
       print_line(0, "--- walking $evm.parent ---")
       print_line(0, "$evm.parent = #{$evm.parent}   #{type($evm.parent)}")
       walk_object("$evm.parent", $evm.parent)
@@ -845,6 +860,7 @@ begin
   # and finally $evm.object if requested...
   #
   if $print_evm_object
+    GC.start
     print_line(0, "--- walking $evm.object ---")
     print_line(0, "$evm.object = #{$evm.object}   #{type($evm.object)}")
     walk_object("$evm.object", $evm.object)
@@ -853,6 +869,7 @@ begin
   # Exit method
   #
   $evm.log("info", "#{$method}:   Object Walker Complete")
+  GC.start
   exit MIQ_OK
 rescue JSON::ParserError  => err
   $evm.log("error", "#{$method} (object_walker) - Invalid JSON string passed as #{$walk_association_policy}")
