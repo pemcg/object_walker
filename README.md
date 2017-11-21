@@ -170,23 +170,18 @@ The resulting output dump will leave out any keys or attributes that have nil va
 
 There are two ways of installing object\_walker.
 
-### The Easy Way
+### Importing the datastore via git
 
-Copy the investigative_debugging.zip datastore export to your local system, and import it from the *Automate -> Import / Export* menu. This will import a domain called `Investigative_Debugging` containing the `Discovery` namespace, and its class, instance and method. The class schema contains a sample general-purpose whitelist.
+If you have the _Git Repositories Owner_ server role enabled on an appliance you can git import object\_walker straight into the automate datastore. Use the URL https://github.com/pemcg/object_walker
 
-### The Manual Way
+![Screenshot 09](images/screenshot09.jpg)
 
-In a suitable namespace, create an _ObjectWalker_ class, and an instance and method each of name _object\_walker_, as follows:
+This will import a domain called `Investigative_Debugging` containing the `Discovery` namespace, and its class, instance and method. The class schema contains a sample general-purpose whitelist.
 
-![Screenshot 04](images/screenshot04.jpg)
+### Importing the domain from a zip file
 
-Edit the schema of the _ObjectWalker_ class to add the attributes and an _execute_ field to run the method, as follows:
+Copy the investigative_debugging.zip datastore export to your local system, and import it from the *Automate -> Import / Export* menu. This will import the _Investigative\_Debugging_ domain.
 
-![Screenshot 05](images/screenshot05.jpg)
-
-Now edit the instance schema to add suitable attribute values, as follows:
-
-![Screenshot 06](images/screenshot06.jpg)
 
 ## Calling object\_walker
 
@@ -206,7 +201,17 @@ $evm.instantiate('/Discovery/ObjectWalker/object_walker')
 
 ## Reading the Output
 
-Although we could inspect the lines printed by object_walker by following _automation.log_, the preferred way to read the output is to copy _object\_walker\_reader.rb_ from the repository to the CloudForms/ManageIQ appliance. This formats the output, and gives us several options for selecting various object_walker dumps.
+Although we could inspect the lines printed by object_walker by following _automation.log_, the preferred way to read the output is to install _object\_walker\_reader.rb_ from the repository to the CloudForms/ManageIQ appliance. 
+
+This can be done either using RPM as follows:
+
+```
+rpm -ivh https://github.com/pemcg/object_walker/raw/master/object_walker_reader-<version>.noarch.rpm
+```
+
+...or by copying the object\_walker\_reader-\<version\>.tar.gz to /root on an appliance and unpacking it.
+
+object\_walker\_reader.rb formats the output, and gives us several options for selecting various object\_walker dumps.
 
 ### object\_walker\_reader
 
