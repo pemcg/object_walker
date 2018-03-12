@@ -55,18 +55,21 @@
 #               1.4     02-Nov-2015     Print continuation lines where a value is multi-line
 #               1.7     08-Dec-2015     Bumping version to match object_walker 1.7. We now handle the indentation string here
 #               1.8     19-Oct-2017     Ignore stack traces in output
+#               1.9     12-Mar-2018     Ignore debug traces in automation.log (CFME 5.9.0.22 has many)
 #  
 
 require 'optparse'
 require 'tempfile'
 
-VERSION = "1.8"
+VERSION = "1.9"
 @debug = false
 
 valid_timestamp_re = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}/
 #
 # Match 1.7 format object_walker dumps
 #
+@debug_line_re          = %r{^\[----\] D,}
+@non_debug_line_re      = %r{^\[----\] [IEW],}
 @object_walker_start_re = %r{
                             ----\]\ I,\ \[(?<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6})
                             \ .*[Oo]bject_*[Ww]alk.*?(?<id>\#\w+):\ \ \ (?<output>Object\ Walker\ (?<version>.+)\ Starting)
@@ -154,7 +157,15 @@ def find_dump(file, timestamp=nil, tempfile=nil)
   #
   file.seek(dump_start)
   indent_level = 0
+  debug_output   = false
   file.each do |line|
+    #
+    # A rails logger debug line might add many lines of output to automation.log
+    # and we need to ignore this
+    #
+    debug_output = true if @debug_line_re.match(line)
+    debug_output = false if @non_debug_line_re.match(line)
+    
     match = @object_walker_start_re.match(line)
     if match
       if match[:id] == id
@@ -164,10 +175,11 @@ def find_dump(file, timestamp=nil, tempfile=nil)
           tempfile.write("#{match[:output]}\n")
         end
       end
+      next
     end
     match = @object_walker_body_re.match(line)
     if match
-      if match[:continuation_line]
+      if match[:continuation_line] && !debug_output
         unless line =~ /^\/.*\d+:in .*$/  # ignore stack trace lines
           if tempfile.nil?
             puts "#{indent_level_to_string(indent_level)}#{line}"
@@ -185,6 +197,7 @@ def find_dump(file, timestamp=nil, tempfile=nil)
           tempfile.write("#{indent_level_to_string(indent_level)}#{match[:output]}\n")
         end
       end
+      next
     end
     match = @object_walker_end_re.match(line)
     if match
