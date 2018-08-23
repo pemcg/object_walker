@@ -1,6 +1,6 @@
 %define name        object_walker_reader
 %define release     1
-%define version     1.8
+%define version     2.0
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
