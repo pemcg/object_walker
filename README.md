@@ -69,11 +69,9 @@ other associations. To prevent the same object being printed multiple times the 
     |    |    Object MiqAeServiceManageIQ_Providers_Openstack_CloudManager_Vm with ID 23 has already been printed...
 ```
 
-## 
+## ** NEW ** Configuration Instance
 
-## Configuration Instance
-
-object_walker 2.0 comes with a new _configuration_ instance containing the configuration attributes. The configuation instance **must** be called _/Discovery/ObjectWalker/configuration_.
+object_walker 2.0 comes with a new _configuration_ instance containing the configuration attributes. The configuration instance **must** be called _/Discovery/ObjectWalker/configuration_.
 
 > **Note**
 > 
@@ -198,7 +196,25 @@ Copy the investigative_debugging.zip datastore export to your local system, and 
 
 ## Invoking object\_walker
 
-We can get an object\_walker dump by simply calling the _object\_walker_ instance from anywhere in the automation namespace. For example if we wish to examine the `$evm.root` object structure part-way through a VM provisioning workflow, we could add a call to object_walker from a state in the VM Provision State Machine, as follows:
+There are three ways of invoking object\_walker.
+
+### *** NEW *** As an Embedded Method
+
+object\_walker can be callable as an embedded method with CloudForms 4.6 / ManageIQ _Gaprindashvili_ . The calling method should embed the _/Discovery/ObjectWalker/object\_walker_ "library" method, and invoke it using:
+
+`Investigative_Debugging::Discovery::ObjectWalker.walk_objects`
+
+For example:
+
+![Screenshot 08](images/screenshot10.png)
+
+Calling object\_walker in this way gives the most accurate view of the `$evm` object structure in relation to the calling method.
+
+### From an Instance Relationship
+
+An object\_walker dump can be obtained by simply calling the _/Discovery/ObjectWalker/object\_walker_ instance from a relationship in any instance in the automation namespace. 
+
+For example if we wish to examine the `$evm.root` object structure part-way through a VM provisioning workflow, we could add a call to object\_walker from a state in the VM Provision State Machine, as follows:
 
 ![Screenshot 07](images/screenshot07.jpg)
 
@@ -206,16 +222,13 @@ If we simply wished to examine the object structure related to a VM object, we c
 
 ![Screenshot 08](images/screenshot08.jpg)
 
-We can even call object_walker in-line from another automation method, using `$evm.instantiate`, as follows:
+### From $evm.instantiate
+
+object\_walker can be called in-line from another automation method, using `$evm.instantiate`, as follows:
 
 ```
 $evm.instantiate('/Discovery/ObjectWalker/object_walker')
 ```
-
-### Invoking object\_walker as an Embedded Method
-
-With CloudForms 4.6 / ManageIQ _Gaprindashvili_ object\_walker can be callable as an embedded method.
-
 
 ## Reading the Output
 
