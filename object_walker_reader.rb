@@ -56,12 +56,13 @@
 #               1.7     08-Dec-2015     Bumping version to match object_walker 1.7. We now handle the indentation string here
 #               1.8     19-Oct-2017     Ignore stack traces in output
 #               1.9     12-Mar-2018     Ignore debug traces in automation.log (CFME 5.9.0.22 has many)
+#               2.0     22-Aug-2018     Handle object_walker being callable as an embedded method (so method name might not be object_walker)
 #  
 
 require 'optparse'
 require 'tempfile'
 
-VERSION = "1.9"
+VERSION = "2.0"
 @debug = false
 
 valid_timestamp_re = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}/
@@ -75,10 +76,10 @@ valid_timestamp_re = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}/
                             \ .*[Oo]bject_*[Ww]alk.*?(?<id>\#\w+):\ \ \ (?<output>Object\ Walker\ (?<version>.+)\ Starting)
                           }x
 @object_walker_body_re = %r{
-                          .*AEMethod\ [Oo]bject_*[Ww]alk.*>\ [Oo]bject_*[Ww]alk.*?(?<id>\#\w+)*:
+                          .*AEMethod\ .*>\ [Oo]bject_*[Ww]alk.*?(?<id>\#\w+)*:
                           \[(?<indent_level>\d+)\]\ (?<output>.*)
                           |
-                          .*ERROR.*AEMethod\ [Oo]bject_*[Ww]alk.*>\ [Oo]bject_*[Ww]alk.*?(?<id>\#\w+)*\ (?<output>.*)
+                          .*ERROR.*AEMethod\ .*>\ [Oo]bject_*[Ww]alk.*?(?<id>\#\w+)*\ (?<output>.*)
                           |
                           (?<continuation_line>^[^\[].+$)
                           }x
@@ -157,7 +158,7 @@ def find_dump(file, timestamp=nil, tempfile=nil)
   #
   file.seek(dump_start)
   indent_level = 0
-  debug_output   = false
+  debug_output = false
   file.each do |line|
     #
     # A rails logger debug line might add many lines of output to automation.log

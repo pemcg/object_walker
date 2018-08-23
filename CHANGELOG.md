@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.0 (22-Aug-2018)
+Re-factored to be callable as an embedded method in CFME 5.9/ManageIQ Gaprindashvili. Configuration parameters
+are now in a new instance called 'configuration'
+
 ## 1.10 (21-Oct-2017)
 More intelligent handing of broken associations. Includes a corresponding update to object_walker_reader.rb
 

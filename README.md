@@ -1,8 +1,8 @@
 # object_walker
 
-One of the challenges when starting out writing CloudForms or ManageIQ automation scripts, is knowing where the objects and attributes are under $evm.root that we may need to access. For example, depending on the automation action, we may have an $evm.root['vm'] object, or we may not.
+One of the challenges when starting out writing CloudForms or ManageIQ automation scripts, is knowing where the objects and attributes are under `$evm.root` that we may need to access. For example, depending on the automation action, we may have an `$evm.root['vm']` object, or we may not.
 
-This script is an attempt to demystify the object structure that is available at any point in the Automation Engine.
+This script is an attempt to demystify the object structure that is available at any point in an Automation workflow.
 
 Calling the script from any point will walk the object hierarchy from `$evm.root` downwards, printing objects and attributes
 as it goes, i.e.
@@ -69,14 +69,58 @@ other associations. To prevent the same object being printed multiple times the 
     |    |    Object MiqAeServiceManageIQ_Providers_Openstack_CloudManager_Vm with ID 23 has already been printed...
 ```
 
-## Walk Association Policy
+## 
+
+## Configuration Instance
+
+object_walker 2.0 comes with a new _configuration_ instance containing the configuration attributes. The configuation instance **must** be called _/Discovery/ObjectWalker/configuration_.
+
+> **Note**
+> 
+> For backwards compatibility and for invoking _object\_walker_ via `$evm.instantiate` or from an instance relationship, the _object\_walker_ instance still remains, however this no longer contains the configuration attributes.
+
+### print\_evm\_object 
+
+print\_evm\_object can be used to toggle whether or not to walk the object structure of the `$evm.object` (i.e current) object. If object\_walker has been invoked from `$evm.instantiate` or from a relationship then `$evm.object` will be object\_walker itself. If object\_walker has been invoked from an embedded method then $evm.object is the calling method's instance.
+
+### print\_evm\_parent
+
+print\_evm\_parent can be used to toggle whether or not to walk the object structure of the `$evm.parent` object. If object\_walker has been invoked from `$evm.instantiate` or from a relationship then `$evm.parent` will be the calling instance.
+
+### print\_nil\_values
+
+Many attributes that get printed have a value of 'nil', i.e.
+
+```
+     |    |    $evm.root['user'].userid = admin   (type: String)
+     |    |    --- end of attributes ---
+     |    |    --- virtual columns follow ---
+     |    |    $evm.root['user'].allocated_memory = 0   (type: Fixnum)
+     |    |    $evm.root['user'].allocated_storage = 0   (type: Fixnum)
+     |    |    $evm.root['user'].allocated_vcpu = 0   (type: Fixnum)
+     |    |    $evm.root['user'].custom_1 = nil
+     |    |    $evm.root['user'].custom_2 = nil
+     |    |    $evm.root['user'].custom_3 = nil
+     |    |    $evm.root['user'].custom_4 = nil
+     |    |    $evm.root['user'].custom_5 = nil
+     |    |    $evm.root['user'].custom_6 = nil
+     |    |    $evm.root['user'].custom_7 = nil
+     |    |    $evm.root['user'].custom_8 = nil
+     |    |    $evm.root['user'].custom_9 = nil
+     |    |    $evm.root['user'].ldap_group = EvmGroup-super_administrator   (type: String)
+     |    |    $evm.root['user'].miq_group_description = EvmGroup-super_administrator   (type: String)
+```
+
+print\_nil\_values can be used to toggle whether or not to include keys that have a nil value in the output dump. There are often many, and including them will usually increase verbosity, but it is sometimes useful to know that a key/attribute exists, even if it currently has no assigned value.
+
+### walk\_association\_policy
 
 Many of the objects that we can walk through are in fact Rails Active Record Associations (object representations of database
 records), and we often don't want to print all of them. The script uses a `walk_association_policy`, variable to help decide which associations to traverse; it should have the value of either "whitelist" or "blacklist". This variable defaults to "whitelist" unless overridden by an instance schema attribute called _walk\_association\_policy_ (read as `$evm.object['walk_association_policy']`).
 
-### Whitelist
+### walk\_association\_whitelist
 
-if `walk_association_policy` = _whitelist_, then object\_walker will only traverse associations of objects that are explicitly
+If `walk_association_policy` = _whitelist_, then object\_walker will only traverse associations of objects that are explicitly
 mentioned in the `walk_association_whitelist` JSON-like hash (either defined in the instance schema, or in a service dialog). The string "ALL" can be used to walk all associations of an object type. A typical whitelist hash is as follows:
 
 ```
@@ -107,7 +151,7 @@ object type. In the example whitelist hash above, we would add to the list defin
 "MiqAeServiceUser":["current_group", "current_tenant"],
 ```
 
-### Blacklist
+### walk\_association\_blacklist
 
 if `walk_association_policy` = _blacklist_, then object\_walker will traverse all associations of all objects, _except_ those that
 are explicitly mentioned in the `walk_association_blacklist` hash. This enables us to run a more exploratory dump, at the
@@ -119,7 +163,7 @@ cost of a **much** more verbose output. The format of the blacklist is the same 
 
 ---
 
-### Defining the Hashes in the Instance Schema
+### Defining the Hashes in the _configuration_ Instance Schema
 
 The _walk\_association\_whitelist_ and _walk\_association\_blacklist_ hash definitions are JSON-like hashes, but either single or double quotes can be used, and the quotes don't need to be escaped by backslashes. We define the _walk\_association\_policy_, _walk\_association\_whitelist_ and _walk\_association\_blacklist_ as attributes of data type _String_ in the class and instance schema.
 
@@ -134,37 +178,6 @@ When exploring the object model, we frequently update the walk\_association\_whi
 To avoid having to edit the instance attributes in such circumstances, a service dialog can be created containing a text area box element named _walk\_association\_whitelist_ or _walk\_association\_blacklist_. Any valid JSON-like whitelist hash entered into this dialog field will be used as a run-time override of the walk\_association\_whitelist or walk\_association\_blacklist defined in the instance schema. The object\_walker instance can then be called from a button, configured to display the dialog.
 
 ![Screenshot 07](images/screenshot02.jpg)
-
-### Removing nil Values
-
-Many attributes that get printed have a value of 'nil', i.e.
-
-```
-     |    |    $evm.root['user'].userid = admin   (type: String)
-     |    |    --- end of attributes ---
-     |    |    --- virtual columns follow ---
-     |    |    $evm.root['user'].allocated_memory = 0   (type: Fixnum)
-     |    |    $evm.root['user'].allocated_storage = 0   (type: Fixnum)
-     |    |    $evm.root['user'].allocated_vcpu = 0   (type: Fixnum)
-     |    |    $evm.root['user'].custom_1 = nil
-     |    |    $evm.root['user'].custom_2 = nil
-     |    |    $evm.root['user'].custom_3 = nil
-     |    |    $evm.root['user'].custom_4 = nil
-     |    |    $evm.root['user'].custom_5 = nil
-     |    |    $evm.root['user'].custom_6 = nil
-     |    |    $evm.root['user'].custom_7 = nil
-     |    |    $evm.root['user'].custom_8 = nil
-     |    |    $evm.root['user'].custom_9 = nil
-     |    |    $evm.root['user'].ldap_group = EvmGroup-super_administrator   (type: String)
-     |    |    $evm.root['user'].miq_group_description = EvmGroup-super_administrator   (type: String)
-```
-
-Sometimes we want to know that the attribute is present, even if its value is nil, but at other times we only wish to know
-about attributes with valid values (this also gives us a more concise dump output). In this case we can define an optional instance attribute of data type _Boolean_, called `print_nil_values`, and give it a value of _false_, as follows:
-
-![Screenshot 07](images/screenshot03.jpg)
-
-The resulting output dump will leave out any keys or attributes that have nil values.
 
 ## Installation
 
@@ -183,9 +196,9 @@ This will import a domain called `Investigative_Debugging` containing the `Disco
 Copy the investigative_debugging.zip datastore export to your local system, and import it from the *Automate -> Import / Export* menu. This will import the _Investigative\_Debugging_ domain.
 
 
-## Calling object\_walker
+## Invoking object\_walker
 
-We get an object\_walker dump by simply calling the _object\_walker_ instance from anywhere in the automation namespace. For example if we wish to examine the $evm.root object structure part-way through a VM provisioning workflow, we could add a call to object_walker from a state in the VM Provision State Machine, as follows:
+We can get an object\_walker dump by simply calling the _object\_walker_ instance from anywhere in the automation namespace. For example if we wish to examine the `$evm.root` object structure part-way through a VM provisioning workflow, we could add a call to object_walker from a state in the VM Provision State Machine, as follows:
 
 ![Screenshot 07](images/screenshot07.jpg)
 
@@ -198,6 +211,11 @@ We can even call object_walker in-line from another automation method, using `$e
 ```
 $evm.instantiate('/Discovery/ObjectWalker/object_walker')
 ```
+
+### Invoking object\_walker as an Embedded Method
+
+With CloudForms 4.6 / ManageIQ _Gaprindashvili_ object\_walker can be callable as an embedded method.
+
 
 ## Reading the Output
 
