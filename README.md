@@ -206,7 +206,7 @@ object\_walker can be callable as an embedded method with CloudForms 4.6 / Manag
 
 For example:
 
-![Screenshot 08](images/screenshot10.png)
+![Screenshot 08](images/screenshot10.jpg)
 
 Calling object\_walker in this way gives the most accurate view of the `$evm` object structure in relation to the calling method.
 
