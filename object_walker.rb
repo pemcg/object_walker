@@ -741,6 +741,6 @@ module Investigative_Debugging
     end
   end
 end
-if $evm.object.match("ObjectWalker/object_walker")
+if $evm.object.name.match("ObjectWalker/object_walker")
   Investigative_Debugging::Discovery::ObjectWalker.walk_objects
 end
