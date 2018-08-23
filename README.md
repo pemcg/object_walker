@@ -69,7 +69,7 @@ other associations. To prevent the same object being printed multiple times the 
     |    |    Object MiqAeServiceManageIQ_Providers_Openstack_CloudManager_Vm with ID 23 has already been printed...
 ```
 
-## ** NEW ** Configuration Instance
+## Configuration Instance - NEW!
 
 object_walker 2.0 comes with a new _configuration_ instance containing the configuration attributes. The configuration instance **must** be called _/Discovery/ObjectWalker/configuration_.
 
@@ -198,7 +198,7 @@ Copy the investigative_debugging.zip datastore export to your local system, and 
 
 There are three ways of invoking object\_walker.
 
-### *** NEW *** As an Embedded Method
+### As an Embedded Method - NEW!
 
 object\_walker can be callable as an embedded method with CloudForms 4.6 / ManageIQ _Gaprindashvili_ . The calling method should embed the _/Discovery/ObjectWalker/object\_walker_ "library" method, and invoke it using:
 
