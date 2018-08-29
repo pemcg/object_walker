@@ -193,6 +193,10 @@ This will import a domain called `Investigative_Debugging` containing the `Disco
 
 Copy the investigative_debugging.zip datastore export to your local system, and import it from the *Automate -> Import / Export* menu. This will import the _Investigative\_Debugging_ domain.
 
+## Upgrading to 2.0
+
+The schema of the _ObjectWalker_ class has changed. If any customisations have been made to an _object\_walker_ v1.x instance (such as an updated whitelist) these should be saved, and the old _ObjectWalker_ class and associated _object\_walker_ v1.x instance and method should be deleted. Once _object\_walker_ v2.0 has been installed the previous modifications can be re-applied to a copy of the new _configuration_ instance.
+
 
 ## Invoking object\_walker
 
