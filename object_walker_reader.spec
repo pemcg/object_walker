@@ -22,13 +22,13 @@ object_walker_reader extracts the output from object_walker and writes it out in
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/root
-install -m 0755 %{name}.rb %{buildroot}/root/%{name}.rb
+mkdir -p %{buildroot}/%_bindir
+install -m 0755 %{name}.rb %{buildroot}/%_bindir/%{name}
 
 %files
 
 %defattr(-,root,root)
-%attr(0755,root,root) /root/object_walker_reader.rb
+%attr(0755,root,root) %_bindir/object_walker_reader
 
 %doc
 
